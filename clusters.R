@@ -1,7 +1,35 @@
-# 7 clusters of interest from prior mapping
 library(rgdal); library(tidycensus)
 library(stringr); library(ggplot2)
-clusters <- read.csv("D:/alarson/SuburbanizationPoverty/CensusData/TargetTracts.csv")
+library(dplyr)
+# identify clusters of interest through spatial overlays
+setwd("D:/alarson/SuburbanizationPoverty/Outputs")
+pov90 <- readOGR(".", "countyPov90", stringsAsFactors = FALSE)
+pov00 <- readOGR(".", "countyPov00", stringsAsFactors = FALSE)
+pov10 <- readOGR(".", "countyPov10", stringsAsFactors = FALSE)
+pov16 <- readOGR(".", "countyPov16", stringsAsFactors = FALSE)
+intersections <- rbind((as.data.frame(pov16[pov90,]))["GEOID"], # 2016 in 1990
+                       (as.data.frame(pov16[pov00,]))["GEOID"], # 2016 in 2000
+                       (as.data.frame(pov16[pov10,]))["GEOID"]) # 2016 in 2010
+intersections <- distinct(intersections)
+intersections <- merge(pov16, intersections, by = "GEOID")
+# Join this with attributes
+setwd("D:/alarson/SuburbanizationPoverty/CensusData")
+attrib <- readOGR(".", "DVRPCBOUNDARY", stringsAsFactors = FALSE)
+
+intersections <- intersections[c(1)]
+attribIntersections <- over(intersections, attrib)
+attribIntersections$GEOID <- intersections$GEOID
+attribIntersections <- attribIntersections[c("GEOID",
+                                             "CO_NAME",
+                                             "MUN_NAME",
+                                             "MUN_TYPE")]
+colnames(attribIntersections) <- c("GEOID", "County", "PlaceName", "Type")
+# write.csv(attribIntersections, "TargetTracts.csv", row.names = FALSE)
+
+clusters <- read.csv("D:/alarson/SuburbanizationPoverty/CensusData/TargetTracts.csv",
+                     stringsAsFactors = FALSE)
+clusters <- subset(clusters, clusters$Type != "City")
+
 setwd("D:/alarson/SuburbanizationPoverty/Outputs")
 trct16 <- readOGR(".", "pov16", stringsAsFactors = FALSE)
 
@@ -16,6 +44,8 @@ collect <- get_acs(geography = "tract",
                      "B01003_001E",
                      "B19013_001E",
                      "B25071_001E",
+                     "B14001_001E",
+                     "B14001_002E",
                      myCall))
 # Clean up fields
 collect <- collect[, -( grep("\\M$" , colnames(collect), perl = TRUE))]
@@ -24,8 +54,15 @@ collect$st <- substr(collect$GEOID, 1, 2)
 collect$cty <- substr(collect$GEOID, 3, 5)
 collect$stcty <- paste0(collect$st, collect$cty)
 # Subset out DVRPC counties
-dvrpc <- c("34015", "42017", "42029", "42091")
+dvrpc <- c("34005", "34007", "34015", "34021",
+           "42017", "42029", "42045", "42091")
 collect <- subset(collect, stcty %in% dvrpc)
+# Drop low-population tracts
+collect <- collect[collect$B01003_001E >= 1000,]
+# Drop tracts with loooooooots of students
+collect$pctStudent <- collect$B14001_002E / collect$B14001_001E * 100
+students <- na.omit(collect$pctStudent); plot(density(students))
+collect <- collect[collect$pctStudent < 50,] # too conservative?
 
 # Link clusters to estimates
 clusters$GEOID <- as.character(clusters$GEOID)
@@ -35,7 +72,7 @@ clusterRes <- data.frame()
 for (i in 1:length(clusters)){
   caPlaceName <- as.character(clusters[[i]]$PlaceName[1])
   caStCty <- clusters[[i]]$stcty[1]
-  caCtyName <- as.character(clusters[[i]]$CtyName[1])
+  caCtyName <- as.character(clusters[[i]]$County[1])
   caMedInc <- weighted.mean(clusters[[i]]$B19013_001E,
                             clusters[[i]]$B01003_001E,
                             na.rm = TRUE)
@@ -54,15 +91,13 @@ for (i in 1:length(clusters)){
   caPop <- mean(clusters[[i]]$B01003_001E, na.rm = TRUE)
   myRow <- data.frame("placeName" = caPlaceName,
                       "stcty" = caStCty,
-                      "countyName" = caCtyName,
-                      "medInc" = caMedInc,
-                      "hisp" = caHisp,
-                      "wht" = caWht,
-                      "blk" = caBlk,
-                      "trctPop" = caPop)
+                      "MedianIncome_p" = caMedInc,
+                      "PctHispanic_p" = caHisp,
+                      "PctWhite_p" = caWht,
+                      "PctBlack_p" = caBlk,
+                      "MeanTrctPop_p" = caPop)
   clusterRes <- rbind(clusterRes, myRow)
 }
-clusterRes <- clusterRes[,-c(3)]
 
 counties <- split(collect, as.factor(collect$stcty))
 countyRes <- data.frame()
@@ -85,31 +120,43 @@ for (i in 1:length(counties)){
                          na.rm = TRUE)
   caPop <- mean(counties[[i]]$B01003_001E, na.rm = TRUE)
   myRow <- data.frame("stcty" = caStCty,
-                      "medInc" = caMedInc,
-                      "hisp" = caHisp,
-                      "wht" = caWht,
-                      "blk" = caBlk,
-                      "trctPop" = caPop)
+                      "MedianIncome_c" = caMedInc,
+                      "PctHispanic_c" = caHisp,
+                      "PctWhite_c" = caWht,
+                      "PctBlack_c" = caBlk,
+                      "MeanTrctPop_c" = caPop)
   countyRes <- rbind(countyRes, myRow)
 }
 
-countyRes <- rbind(countyRes[2,], countyRes[2,], countyRes[3,],
-                   countyRes[1,], countyRes[4,], countyRes[2,],
-                   countyRes[3,])
-countyRes$placeName <- clusterRes$placeName
-clusterRes$Identity <- "Cluster"; countyRes$Identity <- "County"
-plot1 <- rbind(countyRes, clusterRes)
-for (i in 2:6){
-  res <- ggplot(plot1, aes_string(fill = "Identity",
-                                       y = names(plot1)[i],
-                                       x = "placeName")) +
-                geom_bar(position = "dodge", stat = "identity") +
+# Merge then reshape
+fullRes <- merge(clusterRes, countyRes, by = "stcty", all.x = TRUE)
+fullRes <- fullRes[-c(1)]
+fullResL <- reshape(fullRes, varying = c("MedianIncome_p",
+                                         "MedianIncome_c",
+                                         "PctHispanic_p",
+                                         "PctHispanic_c",
+                                         "PctWhite_p",
+                                         "PctWhite_c",
+                                         "PctBlack_p",
+                                         "PctBlack_c",
+                                         "MeanTrctPop_p",
+                                         "MeanTrctPop_c"),
+                    direction = "long", idvar = "placeName", sep = "_")
+colnames(fullResL)[2] <- "Geography"
+fullResL$Geography <- ifelse(fullResL$Geography == "p", "Cluster", "County")
+fullResL$Geography <- as.factor(fullResL$Geography)
+
+for (i in 3:7){
+  res <- ggplot(fullResL, aes_string(fill = "Geography",
+                                     y = names(fullResL)[i],
+                                     x = "placeName")) +
+    geom_bar(position = "dodge", stat = "Identity") +
+    labs(title = paste("Comparison of Counties to Low-Income Tract Clusters,",
+                       names(fullResL)[i], sep = " ")) +
     theme_minimal() + coord_flip()
-  tiff(paste0("compare_", names(plot1)[i], ".tiff"),
+  tiff(paste0("compare_", names(fullResL)[i], ".tiff"),
        units = "in", width = 8, height = 6,
        res = 600, compression = "lzw")
   plot(res)
   dev.off()
 }
-
-# the catch: glassboro and west chester are college towns
