@@ -1,5 +1,6 @@
 # 7 clusters of interest from prior mapping
-library(rgdal); library(tidycensus); library(stringr)
+library(rgdal); library(tidycensus)
+library(stringr); library(ggplot2)
 clusters <- read.csv("D:/alarson/SuburbanizationPoverty/CensusData/TargetTracts.csv")
 setwd("D:/alarson/SuburbanizationPoverty/Outputs")
 trct16 <- readOGR(".", "pov16", stringsAsFactors = FALSE)
@@ -61,6 +62,7 @@ for (i in 1:length(clusters)){
                       "trctPop" = caPop)
   clusterRes <- rbind(clusterRes, myRow)
 }
+clusterRes <- clusterRes[,-c(3)]
 
 counties <- split(collect, as.factor(collect$stcty))
 countyRes <- data.frame()
@@ -83,13 +85,31 @@ for (i in 1:length(counties)){
                          na.rm = TRUE)
   caPop <- mean(counties[[i]]$B01003_001E, na.rm = TRUE)
   myRow <- data.frame("stcty" = caStCty,
-                      "medInc_c" = caMedInc,
-                      "hisp_c" = caHisp,
-                      "wht_c" = caWht,
-                      "blk_c" = caBlk,
-                      "trctPop_c" = caPop)
+                      "medInc" = caMedInc,
+                      "hisp" = caHisp,
+                      "wht" = caWht,
+                      "blk" = caBlk,
+                      "trctPop" = caPop)
   countyRes <- rbind(countyRes, myRow)
 }
 
-clusterRes;countyRes
-# some sort of paired visualization
+countyRes <- rbind(countyRes[2,], countyRes[2,], countyRes[3,],
+                   countyRes[1,], countyRes[4,], countyRes[2,],
+                   countyRes[3,])
+countyRes$placeName <- clusterRes$placeName
+clusterRes$Identity <- "Cluster"; countyRes$Identity <- "County"
+plot1 <- rbind(countyRes, clusterRes)
+for (i in 2:6){
+  res <- ggplot(plot1, aes_string(fill = "Identity",
+                                       y = names(plot1)[i],
+                                       x = "placeName")) +
+                geom_bar(position = "dodge", stat = "identity") +
+    theme_minimal() + coord_flip()
+  tiff(paste0("compare_", names(plot1)[i], ".tiff"),
+       units = "in", width = 8, height = 6,
+       res = 600, compression = "lzw")
+  plot(res)
+  dev.off()
+}
+
+# the catch: glassboro and west chester are college towns
