@@ -67,10 +67,9 @@ collect <- collect[collect$pctStudent < 50,] # too conservative?
 # Link clusters to estimates
 clusters$GEOID <- as.character(clusters$GEOID)
 clusters <- merge(clusters, collect, by = "GEOID")
-clusters <- split(clusters, clusters$PlaceName)
+clusters <- split(clusters, clusters$County)
 clusterRes <- data.frame()
 for (i in 1:length(clusters)){
-  caPlaceName <- as.character(clusters[[i]]$PlaceName[1])
   caStCty <- clusters[[i]]$stcty[1]
   caCtyName <- as.character(clusters[[i]]$County[1])
   caMedInc <- weighted.mean(clusters[[i]]$B19013_001E,
@@ -89,8 +88,8 @@ for (i in 1:length(clusters)){
                          clusters[[i]]$B01003_001E,
                          na.rm = TRUE)
   caPop <- mean(clusters[[i]]$B01003_001E, na.rm = TRUE)
-  myRow <- data.frame("placeName" = caPlaceName,
-                      "stcty" = caStCty,
+  myRow <- data.frame("stcty" = caStCty,
+                      "County" = caCtyName,
                       "MedianIncome_p" = caMedInc,
                       "PctHispanic_p" = caHisp,
                       "PctWhite_p" = caWht,
@@ -141,7 +140,7 @@ fullResL <- reshape(fullRes, varying = c("MedianIncome_p",
                                          "PctBlack_c",
                                          "MeanTrctPop_p",
                                          "MeanTrctPop_c"),
-                    direction = "long", idvar = "placeName", sep = "_")
+                    direction = "long", idvar = "County", sep = "_")
 colnames(fullResL)[2] <- "Geography"
 fullResL$Geography <- ifelse(fullResL$Geography == "p", "Cluster", "County")
 fullResL$Geography <- as.factor(fullResL$Geography)
@@ -149,7 +148,7 @@ fullResL$Geography <- as.factor(fullResL$Geography)
 for (i in 3:7){
   res <- ggplot(fullResL, aes_string(fill = "Geography",
                                      y = names(fullResL)[i],
-                                     x = "placeName")) +
+                                     x = "County")) +
     geom_bar(position = "dodge", stat = "Identity") +
     labs(title = paste("Comparison of Counties to Low-Income Tract Clusters,",
                        names(fullResL)[i], sep = " ")) +
