@@ -211,104 +211,7 @@ trct00 <- readOGR(".", "pov00")
 trct10 <- readOGR(".", "pov10")
 trct16 <- readOGR(".", "pov16")
 
-# determine what's going to "count" as poverty for mclust...
-# start out with +2 SD
-# allBlPov <- c(trct90$pct99_90, trct00$pct99_00, trct10$pct99_10, trct16$pct99_16)
-# cutBlPov <- mean(allBlPov) + 2 * sd(allBlPov) # 39.988%
-
-# v2: +1.5SD relative to the year in question
-# cutBlPov90 <- mean(trct90$pct99_90) + 1.5 * sd(trct90$pct99_90) # 29.97249%
-# cutBlPov00 <- mean(trct00$pct99_00) + 1.5 * sd(trct00$pct99_00) # 30.39282%
-# cutBlPov10 <- mean(trct10$pct99_10) + 1.5 * sd(trct10$pct99_10) # 34.24115%
-# cutBlPov16 <- mean(trct16$pct99_16) + 1.5 * sd(trct16$pct99_16) # 34.02075%
-
-# v3: 30%, since that seems to be what we're centering around
-cutBlPov <- 30
-
-# clusters of persons below 100% FPL
-blPov90 <- trct90[trct90$pct99_90 >= cutBlPov,]
-blPov00 <- trct00[trct00$pct99_00 >= cutBlPov,]
-blPov10 <- trct10[trct10$pct99_10 >= cutBlPov,]
-blPov16 <- trct16[trct16$pct99_16 >= cutBlPov,]
-blPov90c <- coordinates(blPov90)
-blPov00c <- coordinates(blPov00)
-blPov10c <- coordinates(blPov10)
-blPov16c <- coordinates(blPov16)
-
-bic99_90 <- mclustBIC(blPov90c)
-plot(bic99_90); summary(bic99_90)
-mod99_90 <- Mclust(blPov90c, x = bic99_90)
-summary(mod99_90, parameters = TRUE)
-plot(mod99_90, what = "density",
-     ylim = c(4373907.3,4495325.8),
-     xlim = c(402585.1,552345.6))
-mod99_90$parameters$mean
-
-bic99_00 <- mclustBIC(blPov00c)
-plot(bic99_00); summary(bic99_00)
-mod99_00 <- Mclust(blPov00c, x = bic99_00)
-summary(mod99_00, parameters = TRUE)
-plot(mod99_00, what = "density",
-     ylim = c(4373907.3,4495325.8),
-     xlim = c(402585.1,552345.6))
-mod99_00$parameters$mean
-
-bic99_10 <- mclustBIC(blPov10c)
-plot(bic99_10); summary(bic99_10)
-mod99_10 <- Mclust(blPov10c, x = bic99_10)
-summary(mod99_10, parameters = TRUE)
-plot(mod99_10, what = "density",
-     ylim = c(4373907.3,4495325.8),
-     xlim = c(402585.1,552345.6))
-mod99_10$parameters$mean
-
-bic99_16 <- mclustBIC(blPov16c)
-plot(bic99_16); summary(bic99_16)
-mod99_16 <- Mclust(blPov16c, x = bic99_16)
-summary(mod99_16, parameters = TRUE)
-plot(mod99_16, what = "density",
-     ylim = c(4373907.3,4495325.8),
-     xlim = c(402585.1,552345.6))
-mod99_16$parameters$mean
-
-# ought to export the selected points and the tract cluster means
-# points:
-# writeOGR(blPov90, ".", "blPov90.30", "ESRI Shapefile")
-# writeOGR(blPov00, ".", "blPov00.30", "ESRI Shapefile")
-# writeOGR(blPov10, ".", "blPov10.30", "ESRI Shapefile")
-# writeOGR(blPov16, ".", "blPov16.30", "ESRI Shapefile")
-
-# cluster means:
-mod99_90coords <- matrix(c(mod99_90$parameters$mean),
-                         nrow = 4, ncol = 2, byrow = TRUE)
-mod99_90cent <- SpatialPointsDataFrame(mod99_90coords,
-                                       data.frame("oid" = 1:4),
-                                       proj4string = CRS("+init=epsg:26918"))
-# writeOGR(mod99_90cent, ".", "blPov90cent30", "ESRI Shapefile")
-
-mod99_00coords <- matrix(c(mod99_00$parameters$mean),
-                         nrow = 7, ncol = 2, byrow = TRUE)
-mod99_00cent <- SpatialPointsDataFrame(mod99_00coords,
-                                       data.frame("oid" = 1:7),
-                                       proj4string = CRS("+init=epsg:26918"))
-# writeOGR(mod99_00cent, ".", "blPov00cent30", "ESRI Shapefile")
-
-mod99_10coords <- matrix(c(mod99_10$parameters$mean),
-                         nrow = 6, ncol = 2, byrow = TRUE)
-mod99_10cent <- SpatialPointsDataFrame(mod99_10coords,
-                                       data.frame("oid" = 1:6),
-                                       proj4string = CRS("+init=epsg:26918"))
-# writeOGR(mod99_10cent, ".", "blPov10cent30", "ESRI Shapefile")
-
-mod99_16coords <- matrix(c(mod99_16$parameters$mean),
-                         nrow = 6, ncol = 2, byrow = TRUE)
-mod99_16cent <- SpatialPointsDataFrame(mod99_16coords,
-                                       data.frame("oid" = 1:6),
-                                       proj4string = CRS("+init=epsg:26918"))
-# writeOGR(mod99_16cent, ".", "blPov16cent30", "ESRI Shapefile")
-
-# repeat process for indivs 0-199% FPL
-# +1.5SD relative to the year in question
+# Regionwide indivs 0-199% FPL +1.5SD relative to the year in question
 trct90$pct99_199 <- trct90$pct99_90 + trct90$pct199_90
 trct00$pct99_199 <- trct00$pct99_00 + trct00$pct199_00
 trct10$pct99_199 <- trct10$pct99_10 + trct10$pct199_10
@@ -318,14 +221,10 @@ cutBlPov00 <- mean(trct00$pct99_199) + 1.5 * sd(trct00$pct99_199) # 53.20106%
 cutBlPov10 <- mean(trct10$pct99_199) + 1.5 * sd(trct10$pct99_199) # 58.21636%
 cutBlPov16 <- mean(trct16$pct99_199) + 1.5 * sd(trct16$pct99_199) # 59.24802%
 
-# v2: 50% or more
-cutBlPov <- 50
-
-# clusters of persons below 200% FPL
-blPov90 <- trct90[trct90$pct99_199 >= cutBlPov,]
-blPov00 <- trct00[trct00$pct99_199 >= cutBlPov,]
-blPov10 <- trct10[trct10$pct99_199 >= cutBlPov,]
-blPov16 <- trct16[trct16$pct99_199 >= cutBlPov,]
+blPov90 <- trct90[trct90$pct99_199 >= cutBlPov90,]
+blPov00 <- trct00[trct00$pct99_199 >= cutBlPov00,]
+blPov10 <- trct10[trct10$pct99_199 >= cutBlPov10,]
+blPov16 <- trct16[trct16$pct99_199 >= cutBlPov16,]
 blPov90c <- coordinates(blPov90)
 blPov00c <- coordinates(blPov00)
 blPov10c <- coordinates(blPov10)
@@ -367,43 +266,42 @@ plot(mod99_16, what = "density",
      xlim = c(402585.1,552345.6))
 mod99_16$parameters$mean
 
-# ought to export the selected points and the tract cluster means
-# points:
-# writeOGR(blPov90, ".", "pov199.90.50", "ESRI Shapefile")
-# writeOGR(blPov00, ".", "pov199.00.50", "ESRI Shapefile")
-# writeOGR(blPov10, ".", "pov199.10.50", "ESRI Shapefile")
-# writeOGR(blPov16, ".", "pov199.16.50", "ESRI Shapefile")
+# Export the selected polys and the tract cluster means
+# writeOGR(blPov90, ".", "pov199_90", "ESRI Shapefile")
+# writeOGR(blPov00, ".", "pov199_00", "ESRI Shapefile")
+# writeOGR(blPov10, ".", "pov199_10", "ESRI Shapefile")
+# writeOGR(blPov16, ".", "pov199_16", "ESRI Shapefile")
 
-# cluster means:
+# Cluster means:
 mod99_90coords <- matrix(c(mod99_90$parameters$mean),
-                         nrow = 7, ncol = 2, byrow = TRUE)
+                         nrow = 8, ncol = 2, byrow = TRUE)
 mod99_90cent <- SpatialPointsDataFrame(mod99_90coords,
-                                       data.frame("oid" = 1:7),
+                                       data.frame("oid" = 1:8),
                                        proj4string = CRS("+init=epsg:26918"))
-# writeOGR(mod99_90cent, ".", "pov50c90", "ESRI Shapefile")
+# writeOGR(mod99_90cent, ".", "pov199_90c", "ESRI Shapefile")
 
 mod99_00coords <- matrix(c(mod99_00$parameters$mean),
-                         nrow = 7, ncol = 2, byrow = TRUE)
+                         nrow = 8, ncol = 2, byrow = TRUE)
 mod99_00cent <- SpatialPointsDataFrame(mod99_00coords,
-                                       data.frame("oid" = 1:7),
+                                       data.frame("oid" = 1:8),
                                        proj4string = CRS("+init=epsg:26918"))
-# writeOGR(mod99_00cent, ".", "pov50c00", "ESRI Shapefile")
+# writeOGR(mod99_00cent, ".", "pov199_00c", "ESRI Shapefile")
 
 mod99_10coords <- matrix(c(mod99_10$parameters$mean),
                          nrow = 6, ncol = 2, byrow = TRUE)
 mod99_10cent <- SpatialPointsDataFrame(mod99_10coords,
                                        data.frame("oid" = 1:6),
                                        proj4string = CRS("+init=epsg:26918"))
-# writeOGR(mod99_10cent, ".", "pov50c10", "ESRI Shapefile")
+# writeOGR(mod99_10cent, ".", "pov199_10c", "ESRI Shapefile")
 
 mod99_16coords <- matrix(c(mod99_16$parameters$mean),
-                         nrow = 9, ncol = 2, byrow = TRUE)
+                         nrow = 7, ncol = 2, byrow = TRUE)
 mod99_16cent <- SpatialPointsDataFrame(mod99_16coords,
-                                       data.frame("oid" = 1:9),
+                                       data.frame("oid" = 1:7),
                                        proj4string = CRS("+init=epsg:26918"))
-# writeOGR(mod99_16cent, ".", "pov50c16", "ESRI Shapefile")
+# writeOGR(mod99_16cent, ".", "pov199_16c", "ESRI Shapefile")
 
-# One more thing: relative to county
+# Cutoff relative to county and year
 trct90$cty <- as.factor(as.numeric(substr(as.character(trct90$GISJOIN),5,7)))
 trct00$cty <- as.factor(as.numeric(substr(as.character(trct00$GISJOIN),5,7)))
 trct10$cty <- as.factor(as.numeric(substr(as.character(trct10$GISJOIN),5,7)))
@@ -480,8 +378,6 @@ plot(mod99_16, what = "density",
      xlim = c(402585.1,552345.6))
 mod99_16$parameters$mean
 
-# ought to export the selected points and the tract cluster means
-# points:
 # writeOGR(blPov90, ".", "countyPov90", "ESRI Shapefile")
 # writeOGR(blPov00, ".", "countyPov00", "ESRI Shapefile")
 # writeOGR(blPov10, ".", "countyPov10", "ESRI Shapefile")
