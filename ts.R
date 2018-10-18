@@ -4,6 +4,7 @@
 rm(list=ls())
 library(sf); library(dplyr)
 library(ggplot2); library(stringr)
+library(foreign)
 setwd("D:/alarson/SuburbanizationPoverty/Outputs")
 # region
 pov90 <- st_read("./pov90.shp", stringsAsFactors = FALSE)
@@ -106,10 +107,6 @@ ggplot(dat, aes(x = Year, y = BaseChg, group = Type)) +
 # use LTDB to standardize areas to 2010. Must have original GEOID
 # requires STATA, so will do on my home PC later
 setwd("D:/alarson/SuburbanizationPoverty/CensusData")
-xwalk90 <- read.csv("crosswalk_1990_2010.csv", stringsAsFactors = FALSE)
-xwalk00 <- read.csv("crosswalk_2000_2010.csv", stringsAsFactors = FALSE)
-xwalk90$trtid90 <- as.character(xwalk90$trtid90)
-xwalk90$trtid10 <- as.character(xwalk90$trtid10)
 pov <- read.csv("nhgis0006_ts_nominal_tract.csv", stringsAsFactors = FALSE)
 pov$xwalk <- paste(pov$STATEFP, pov$COUNTYFP, sep = "_")
 keep <- subset(pov, xwalk %in% c("34_5", "34_7", "34_15",
@@ -122,5 +119,7 @@ pov90 <- merge(pov90, keep, by.x = "GISJOIN", by.y = "GJOIN1990")
 pov00 <- merge(pov00, keep, by.x = "GISJOIN", by.y = "GJOIN2000")
 pov90 <- as.data.frame(as_Spatial(pov90))
 pov00 <- as.data.frame(as_Spatial(pov00))
-write.csv(pov90, "D:/alarson/SuburbanizationPoverty/SoP/port_90.csv", row.names = FALSE)
-write.csv(pov00, "D:/alarson/SuburbanizationPoverty/SoP/port_00.csv", row.names = FALSE)
+pov90 <- pov90[c(3,5,9)]; pov00 <- pov00[c(3,5,9)]
+
+write.dta(pov90, "D:/alarson/SuburbanizationPoverty/SoP/port_90.dta")
+write.dta(pov00, "D:/alarson/SuburbanizationPoverty/SoP/port_00.dta")

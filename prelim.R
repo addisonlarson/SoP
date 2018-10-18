@@ -52,6 +52,8 @@ colnames(pct) <- gsub("tot", "pct", colnames(pct))
 pct$GID <- pov$NHGISCODE
 pct <- merge(pct, pov, by.x = "GID", by.y = "NHGISCODE")
 pct <- pct[c(1:13)]
+# append universe, oops
+pct <- cbind(pct, pov[c(6:8)])
 
 varNums <- str_pad(as.character(1:131), 3, "left", pad = 0)
 myCall <- paste0("B17024_", varNums, "E")
@@ -100,7 +102,7 @@ collect$tot200_16 <- rowSums(collect[c(seq(13, 133, 13),
 collect$pct99_16 <- collect$tot99_16 / collect$univ_16 * 100
 collect$pct199_16 <- collect$tot199_16 / collect$univ_16 * 100
 collect$pct200_16 <- collect$tot200_16 / collect$univ_16 * 100
-collect <- collect[c(1,141:143)]
+collect <- collect[c(1,137,141:143)]
 
 sts <- c("NJ", "PA") 
 combined <- rbind_tigris(
@@ -109,23 +111,23 @@ combined <- rbind_tigris(
   })
 )
 trct16 <- merge(combined, collect, by = "GEOID")
-trct16 <- trct16[c(1,10:12)]
+trct16 <- trct16[c(1,10:13)]
 trct16 <- sp.na.omit(trct16)
 trct16 <- spTransform(trct16, CRS("+init=epsg:26918"))
 trct16$pct199_16 <- trct16$pct99_16 + trct16$pct199_16
 
 trct90 <- merge(trct90, pct, by.x = "GISJOIN", by.y = "GJOIN1990")
-trct90 <- trct90[c(1, seq(3,9,3))]
+trct90 <- trct90[c(1, seq(3,9,3), 14)]
 trct90 <- sp.na.omit(trct90)
 trct90 <- spTransform(trct90, CRS("+init=epsg:26918"))
 trct90$pct199_90 <- trct90$pct99_90 + trct90$pct199_90
 trct00 <- merge(trct00, pct, by = "GISJOIN", by.y = "GJOIN2000")
-trct00 <- trct00[c(1, seq(4,10,3))]
+trct00 <- trct00[c(1, seq(4,10,3), 15)]
 trct00 <- sp.na.omit(trct00)
 trct00 <- spTransform(trct00, CRS("+init=epsg:26918"))
 trct00$pct199_00 <- trct00$pct99_00 + trct00$pct199_00
 trct10 <- merge(trct10, pct, by = "GISJOIN", by.y = "GJOIN2012")
-trct10 <- trct10[c(1, seq(5,11,3))]
+trct10 <- trct10[c(1, seq(5,11,3), 16)]
 trct10 <- sp.na.omit(trct10)
 trct10 <- spTransform(trct10, CRS("+init=epsg:26918"))
 trct10$pct199_10 <- trct10$pct99_10 + trct10$pct199_10 
