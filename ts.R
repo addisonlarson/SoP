@@ -2,7 +2,8 @@
 # in our neighborhoods of interest as compared to the rest of the region?
 # problematic that I don't have MOEs but I'm running with this as a proof of concept
 rm(list=ls())
-library(sf); library(dplyr); library(ggplot2)
+library(sf); library(dplyr)
+library(ggplot2); library(stringr)
 setwd("D:/alarson/SuburbanizationPoverty/Outputs")
 # region
 pov90 <- st_read("./pov90.shp", stringsAsFactors = FALSE)
@@ -47,17 +48,17 @@ region <- list(as.data.frame(pov90),
                as.data.frame(pov00),
                as.data.frame(pov10),
                as.data.frame(pov16))
-regionMeans <- data.frame("Mean" = sapply(region, function(x) mean(rowSums(x[,2:3]))))
+regionMeans <- data.frame("Mean" = sapply(region, function(x) mean(x[,3])))
 city <- list(as.data.frame(city90),
              as.data.frame(city00),
              as.data.frame(city10),
              as.data.frame(city16))
-cityMeans <- data.frame("Mean" = sapply(city, function(x) mean(x[,6])))
+cityMeans <- data.frame("Mean" = sapply(city, function(x) mean(x[,4])))
 cluster <- list(as.data.frame(cPov90),
                 as.data.frame(cPov00),
                 as.data.frame(cPov10),
                 as.data.frame(cPov16))
-clusterMeans <- data.frame("Mean" = sapply(cluster, function(x) mean(x[,6])))
+clusterMeans <- data.frame("Mean" = sapply(cluster, function(x) mean(x[,4])))
 
 regionMeans$Type <- "Region"; cityMeans$Type <- "Low-Income Urban"; clusterMeans$Type <- "Low-Income Suburban/Rural"
 regionMeans$Year <- c(1990,2000,2010,2016); cityMeans$Year <- c(1990,2000,2010,2016); clusterMeans$Year <- c(1990,2000,2010,2016)
@@ -102,16 +103,24 @@ ggplot(dat, aes(x = Year, y = BaseChg, group = Type)) +
 # dev.off()
 
 # now for the fun part...matching up tracts from 1990 to now
+# use LTDB to standardize areas to 2010. Must have original GEOID
+# requires STATA, so will do on my home PC later
 setwd("D:/alarson/SuburbanizationPoverty/CensusData")
+xwalk90 <- read.csv("crosswalk_1990_2010.csv", stringsAsFactors = FALSE)
+xwalk00 <- read.csv("crosswalk_2000_2010.csv", stringsAsFactors = FALSE)
+xwalk90$trtid90 <- as.character(xwalk90$trtid90)
+xwalk90$trtid10 <- as.character(xwalk90$trtid10)
 pov <- read.csv("nhgis0006_ts_nominal_tract.csv", stringsAsFactors = FALSE)
 pov$xwalk <- paste(pov$STATEFP, pov$COUNTYFP, sep = "_")
 keep <- subset(pov, xwalk %in% c("34_5", "34_7", "34_15",
                                  "34_21", "42_17", "42_29",
                                  "42_45", "42_91", "42_101"))
-# sep into okay and not okay trcts
-okay <- keep[which(keep$GJOIN1990 != "" &
-                     keep$GJOIN2000 != "" &
-                     keep$GJOIN2012 != ""),]
-notOkay <- keep[which(keep$GJOIN1990 == "" |
-                        keep$GJOIN2000 == "" |
-                        keep$GJOIN2012 == ""),]
+# e.g. 42101035300, SSCCCTTTTTT
+keep$origGEOID <- paste0(keep$STATEFP, str_pad(keep$COUNTYFP, 3, "left", "0"), keep$TRACTA)
+keep <- keep[c(1:4,52)]
+pov90 <- merge(pov90, keep, by.x = "GISJOIN", by.y = "GJOIN1990")
+pov00 <- merge(pov00, keep, by.x = "GISJOIN", by.y = "GJOIN2000")
+pov90 <- as.data.frame(as_Spatial(pov90))
+pov00 <- as.data.frame(as_Spatial(pov00))
+write.csv(pov90, "D:/alarson/SuburbanizationPoverty/SoP/port_90.csv", row.names = FALSE)
+write.csv(pov00, "D:/alarson/SuburbanizationPoverty/SoP/port_00.csv", row.names = FALSE)

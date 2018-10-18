@@ -112,19 +112,23 @@ trct16 <- merge(combined, collect, by = "GEOID")
 trct16 <- trct16[c(1,10:12)]
 trct16 <- sp.na.omit(trct16)
 trct16 <- spTransform(trct16, CRS("+init=epsg:26918"))
+trct16$pct199_16 <- trct16$pct99_16 + trct16$pct199_16
 
 trct90 <- merge(trct90, pct, by.x = "GISJOIN", by.y = "GJOIN1990")
 trct90 <- trct90[c(1, seq(3,9,3))]
 trct90 <- sp.na.omit(trct90)
 trct90 <- spTransform(trct90, CRS("+init=epsg:26918"))
+trct90$pct199_90 <- trct90$pct99_90 + trct90$pct199_90
 trct00 <- merge(trct00, pct, by = "GISJOIN", by.y = "GJOIN2000")
 trct00 <- trct00[c(1, seq(4,10,3))]
 trct00 <- sp.na.omit(trct00)
 trct00 <- spTransform(trct00, CRS("+init=epsg:26918"))
+trct00$pct199_00 <- trct00$pct99_00 + trct00$pct199_00
 trct10 <- merge(trct10, pct, by = "GISJOIN", by.y = "GJOIN2012")
 trct10 <- trct10[c(1, seq(5,11,3))]
 trct10 <- sp.na.omit(trct10)
 trct10 <- spTransform(trct10, CRS("+init=epsg:26918"))
+trct10$pct199_10 <- trct10$pct99_10 + trct10$pct199_10 
 
 # Export for maps
 setwd("D:/alarson/SuburbanizationPoverty/Outputs")
@@ -172,21 +176,10 @@ spatialAC <- matrix(c(as.numeric(b1[1]),
                       as.numeric(b2[1]),
                       as.numeric(b3[1]),
                       as.numeric(b4[1])), nrow = 4, ncol = 1)
-type <- "FPL 100-199%"
+type <- "FPL Below 200%"
 b <- cbind(time, spatialAC, type)
 
-c1 <- Moran.I(trct90$pct200_90, trct90idist)
-c2 <- Moran.I(trct00$pct200_00, trct00idist)
-c3 <- Moran.I(trct10$pct200_10, trct10idist)
-c4 <- Moran.I(trct16$pct200_16, trct16idist)
-spatialAC <- matrix(c(as.numeric(c1[1]),
-                      as.numeric(c2[1]),
-                      as.numeric(c3[1]),
-                      as.numeric(c4[1])), nrow = 4, ncol = 1)
-type <- "FPL 200+%"
-c <- cbind(time, spatialAC, type)
-
-moran <- as.data.frame(rbind(a,b,c))
+moran <- as.data.frame(rbind(a,b))
 colnames(moran) <- c("Year", "SpatialAC", "Level")
 moran$Level <- as.factor(moran$Level)
 moran$SpatialAC <- as.numeric(as.character(moran$SpatialAC))
@@ -201,6 +194,7 @@ ggplot(data = moran, aes(x = Year,
        title = "Spatial clustering of poverty, 1990-2016",
        subtitle = "All observations exhibit statistically significant spatial clustering")
 # dev.off()
+# This graph looks weird now because 0-199% and 200+% sum to union
 
 # next
 # convert to points; look at cluster presence / movement (mclust)
@@ -212,19 +206,15 @@ trct10 <- readOGR(".", "pov10")
 trct16 <- readOGR(".", "pov16")
 
 # Regionwide indivs 0-199% FPL +1.5SD relative to the year in question
-trct90$pct99_199 <- trct90$pct99_90 + trct90$pct199_90
-trct00$pct99_199 <- trct00$pct99_00 + trct00$pct199_00
-trct10$pct99_199 <- trct10$pct99_10 + trct10$pct199_10
-trct16$pct99_199 <- trct16$pct99_16 + trct16$pct199_16
-cutBlPov90 <- mean(trct90$pct99_199) + 1.5 * sd(trct90$pct99_199) # 48.95182%
-cutBlPov00 <- mean(trct00$pct99_199) + 1.5 * sd(trct00$pct99_199) # 53.20106%
-cutBlPov10 <- mean(trct10$pct99_199) + 1.5 * sd(trct10$pct99_199) # 58.21636%
-cutBlPov16 <- mean(trct16$pct99_199) + 1.5 * sd(trct16$pct99_199) # 59.24802%
+cutBlPov90 <- mean(trct90$pct199_90) + 1.5 * sd(trct90$pct199_90) # 48.95182%
+cutBlPov00 <- mean(trct00$pct199_00) + 1.5 * sd(trct00$pct199_00) # 53.20106%
+cutBlPov10 <- mean(trct10$pct199_10) + 1.5 * sd(trct10$pct199_10) # 58.21636%
+cutBlPov16 <- mean(trct16$pct199_16) + 1.5 * sd(trct16$pct199_16) # 59.24802%
 
-blPov90 <- trct90[trct90$pct99_199 >= cutBlPov90,]
-blPov00 <- trct00[trct00$pct99_199 >= cutBlPov00,]
-blPov10 <- trct10[trct10$pct99_199 >= cutBlPov10,]
-blPov16 <- trct16[trct16$pct99_199 >= cutBlPov16,]
+blPov90 <- trct90[trct90$pct199_90 >= cutBlPov90,]
+blPov00 <- trct00[trct00$pct199_00 >= cutBlPov00,]
+blPov10 <- trct10[trct10$pct199_10 >= cutBlPov10,]
+blPov16 <- trct16[trct16$pct199_16 >= cutBlPov16,]
 blPov90c <- coordinates(blPov90)
 blPov00c <- coordinates(blPov00)
 blPov10c <- coordinates(blPov10)
@@ -306,23 +296,23 @@ trct90$cty <- as.factor(as.numeric(substr(as.character(trct90$GISJOIN),5,7)))
 trct00$cty <- as.factor(as.numeric(substr(as.character(trct00$GISJOIN),5,7)))
 trct10$cty <- as.factor(as.numeric(substr(as.character(trct10$GISJOIN),5,7)))
 trct16$cty <- as.factor(as.numeric(substr(as.character(trct16$GEOID),3,5)))
-trct90stats <- merge(aggregate(trct90$pct99_199, list(trct90$cty), FUN = mean),
-                     aggregate(trct90$pct99_199, list(trct90$cty), FUN = sd),
+trct90stats <- merge(aggregate(trct90$pct199_90, list(trct90$cty), FUN = mean),
+                     aggregate(trct90$pct199_90, list(trct90$cty), FUN = sd),
                      by = "Group.1")
 colnames(trct90stats) <- c("cty", "mean", "sd")
 trct90stats$cutBlPov <- trct90stats$mean + 1.5 * trct90stats$sd
-trct00stats <- merge(aggregate(trct00$pct99_199, list(trct00$cty), FUN = mean),
-                     aggregate(trct00$pct99_199, list(trct00$cty), FUN = sd),
+trct00stats <- merge(aggregate(trct00$pct199_00, list(trct00$cty), FUN = mean),
+                     aggregate(trct00$pct199_00, list(trct00$cty), FUN = sd),
                      by = "Group.1")
 colnames(trct00stats) <- c("cty", "mean", "sd")
 trct00stats$cutBlPov <- trct00stats$mean + 1.5 * trct00stats$sd
-trct10stats <- merge(aggregate(trct10$pct99_199, list(trct10$cty), FUN = mean),
-                     aggregate(trct10$pct99_199, list(trct10$cty), FUN = sd),
+trct10stats <- merge(aggregate(trct10$pct199_10, list(trct10$cty), FUN = mean),
+                     aggregate(trct10$pct199_10, list(trct10$cty), FUN = sd),
                      by = "Group.1")
 colnames(trct10stats) <- c("cty", "mean", "sd")
 trct10stats$cutBlPov <- trct10stats$mean + 1.5 * trct10stats$sd
-trct16stats <- merge(aggregate(trct16$pct99_199, list(trct16$cty), FUN = mean),
-                     aggregate(trct16$pct99_199, list(trct16$cty), FUN = sd),
+trct16stats <- merge(aggregate(trct16$pct199_16, list(trct16$cty), FUN = mean),
+                     aggregate(trct16$pct199_16, list(trct16$cty), FUN = sd),
                      by = "Group.1")
 colnames(trct16stats) <- c("cty", "mean", "sd")
 trct16stats$cutBlPov <- trct16stats$mean + 1.5 * trct16stats$sd
@@ -333,10 +323,10 @@ trct10 <- merge(trct10, trct10stats, by = "cty", all.x = TRUE)
 trct16 <- merge(trct16, trct16stats, by = "cty", all.x = TRUE)
 
 # clusters of persons below 200% FPL
-blPov90 <- trct90[trct90$pct99_199 >= trct90$cutBlPov,]
-blPov00 <- trct00[trct00$pct99_199 >= trct00$cutBlPov,]
-blPov10 <- trct10[trct10$pct99_199 >= trct10$cutBlPov,]
-blPov16 <- trct16[trct16$pct99_199 >= trct16$cutBlPov,]
+blPov90 <- trct90[trct90$pct199_90 >= trct90$cutBlPov,]
+blPov00 <- trct00[trct00$pct199_00 >= trct00$cutBlPov,]
+blPov10 <- trct10[trct10$pct199_10 >= trct10$cutBlPov,]
+blPov16 <- trct16[trct16$pct199_16 >= trct16$cutBlPov,]
 blPov90c <- coordinates(blPov90)
 blPov00c <- coordinates(blPov00)
 blPov10c <- coordinates(blPov10)
@@ -425,20 +415,20 @@ timeData <- merge(timeData, xwalk, by.x = "cty", by.y = "xwalkCty", all.x = TRUE
 timeData$cty <- as.character(timeData$xwalkNam); timeData <- timeData[c(1:4)]
 timeData <- rbind(timeData,
                   c("Overall",
-                    mean(trct90$pct99_199),
-                    mean(trct90$pct99_199) + 1.5 * sd(trct90$pct99_199),
+                    mean(trct90$pct199_90),
+                    mean(trct90$pct199_90) + 1.5 * sd(trct90$pct199_90),
                     1990),
                   c("Overall",
-                    mean(trct00$pct99_199),
-                    mean(trct00$pct99_199) + 1.5 * sd(trct00$pct99_199),
+                    mean(trct00$pct199_00),
+                    mean(trct00$pct199_00) + 1.5 * sd(trct00$pct199_00),
                     2000),
                   c("Overall",
-                    mean(trct10$pct99_199),
-                    mean(trct10$pct99_199) + 1.5 * sd(trct10$pct99_199),
+                    mean(trct10$pct199_10),
+                    mean(trct10$pct199_10) + 1.5 * sd(trct10$pct199_10),
                     2010),
                   c("Overall",
-                    mean(trct16$pct99_199),
-                    mean(trct16$pct99_199) + 1.5 * sd(trct16$pct99_199),
+                    mean(trct16$pct199_16),
+                    mean(trct16$pct199_16) + 1.5 * sd(trct16$pct199_16),
                     2016))
 timeData$County <- as.factor(timeData$cty)
 timeData$yr <- as.numeric(timeData$yr)
