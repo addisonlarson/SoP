@@ -121,35 +121,25 @@ pov90 <- as.data.frame(as_Spatial(pov90))
 pov00 <- as.data.frame(as_Spatial(pov00))
 pov90 <- pov90[c(3,5,9)]; pov00 <- pov00[c(3,5,9)]
 
-write.dta(pov90, "D:/alarson/SuburbanizationPoverty/SoP/port_90.dta")
-write.dta(pov00, "D:/alarson/SuburbanizationPoverty/SoP/port_00.dta")
+# write.dta(pov90, "D:/alarson/SuburbanizationPoverty/SoP/port_90.dta")
+# write.dta(pov00, "D:/alarson/SuburbanizationPoverty/SoP/port_00.dta")
 
 setwd("D:/alarson/SuburbanizationPoverty/Outputs")
 new90 <- read_dta("corresp_90.dta")
 new00 <- read_dta("corresp_00.dta")
 new90$pct199_90 <- as.numeric(as.character(as.factor(new90$pct199_90)))
 new00$pct199_00 <- as.numeric(as.character(as.factor(new00$pct199_00)))
-# ...why so many missing? LTDB only keeps tracts that changed boundaries?
-
-drops <- unique(new90$trtid10)
-qelihweil <- subset(pov90, !(origGEOID %in% drops))
-colnames(qelihweil)[3] <- c("trtid10")
-qelihweil <- rbind(qelihweil, new90)
-length(unique(qelihweil$trtid10))
-
-pov16 <- pov16[c(1,4)]
-um <- merge(pov16, qelihweil, by.x = "GEOID", by.y = "trtid10")
 
 # Merge across
 # 2016 (orig. 1298 obs.)
 pov16 <- pov16[c(1,4)]
-# 1990 (drops 2016 to 847 obs.)
+# 1990 (drops 2016 to 1294 obs.)
 new90 <- new90[c(1,2)]
 pov16 <- merge(pov16, new90, by.x = "GEOID", by.y = "trtid10")
-# 2000 (drops 2016 to 843 obs.)
+# 2000 (drops 2016 to 1290 obs.)
 new00 <- new00[c(1,2)]
 pov16 <- merge(pov16, new00, by.x = "GEOID", by.y = "trtid10")
-# 2010 (drops 2016 to 834 obs.)
+# 2010 (drops 2016 to 1281 obs.)
 setwd("D:/alarson/SuburbanizationPoverty/CensusData")
 trct10 <- st_read("./US_tract_2010.shp",
                   stringsAsFactors = FALSE) 
@@ -164,7 +154,8 @@ pov16$base90_00 <- (pov16$pct199_00 - pov16$pct199_90) / pov16$pct199_90 * 100
 pov16$base90_10 <- (pov16$pct199_10 - pov16$pct199_90) / pov16$pct199_90 * 100
 pov16$base90_16 <- (pov16$pct199_16 - pov16$pct199_90) / pov16$pct199_90 * 100
 
-# st_write(pov16, "tsData.shp")
+setwd("D:/alarson/SuburbanizationPoverty/Outputs")
+st_write(pov16, "tsData.shp")
 
 # "Time series"
 pov16 <- as.data.frame(as_Spatial(pov16))
