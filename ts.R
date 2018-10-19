@@ -2,9 +2,8 @@
 # in our neighborhoods of interest as compared to the rest of the region?
 # problematic that I don't have MOEs but I'm running with this as a proof of concept
 rm(list=ls())
-library(sf); library(dplyr)
-library(ggplot2); library(stringr)
-library(foreign)
+library(sf); library(dplyr); library(ggplot2); library(stringr)
+library(foreign); library(haven); library(car)
 setwd("D:/alarson/SuburbanizationPoverty/Outputs")
 # region
 pov90 <- st_read("./pov90.shp", stringsAsFactors = FALSE)
@@ -113,7 +112,8 @@ keep <- subset(pov, xwalk %in% c("34_5", "34_7", "34_15",
                                  "34_21", "42_17", "42_29",
                                  "42_45", "42_91", "42_101"))
 # e.g. 42101035300, SSCCCTTTTTT
-keep$origGEOID <- paste0(keep$STATEFP, str_pad(keep$COUNTYFP, 3, "left", "0"), keep$TRACTA)
+keep$origGEOID <- paste0(keep$STATEFP, str_pad(keep$COUNTYFP, 3, "left", "0"),
+                         str_pad(keep$TRACTA, 6, "left", "0"))
 keep <- keep[c(1:4,52)]
 pov90 <- merge(pov90, keep, by.x = "GISJOIN", by.y = "GJOIN1990")
 pov00 <- merge(pov00, keep, by.x = "GISJOIN", by.y = "GJOIN2000")
@@ -123,3 +123,62 @@ pov90 <- pov90[c(3,5,9)]; pov00 <- pov00[c(3,5,9)]
 
 write.dta(pov90, "D:/alarson/SuburbanizationPoverty/SoP/port_90.dta")
 write.dta(pov00, "D:/alarson/SuburbanizationPoverty/SoP/port_00.dta")
+
+setwd("D:/alarson/SuburbanizationPoverty/Outputs")
+new90 <- read_dta("corresp_90.dta")
+new00 <- read_dta("corresp_00.dta")
+new90$pct199_90 <- as.numeric(as.character(as.factor(new90$pct199_90)))
+new00$pct199_00 <- as.numeric(as.character(as.factor(new00$pct199_00)))
+# ...why so many missing? LTDB only keeps tracts that changed boundaries?
+
+drops <- unique(new90$trtid10)
+qelihweil <- subset(pov90, !(origGEOID %in% drops))
+colnames(qelihweil)[3] <- c("trtid10")
+qelihweil <- rbind(qelihweil, new90)
+length(unique(qelihweil$trtid10))
+
+pov16 <- pov16[c(1,4)]
+um <- merge(pov16, qelihweil, by.x = "GEOID", by.y = "trtid10")
+
+# Merge across
+# 2016 (orig. 1298 obs.)
+pov16 <- pov16[c(1,4)]
+# 1990 (drops 2016 to 847 obs.)
+new90 <- new90[c(1,2)]
+pov16 <- merge(pov16, new90, by.x = "GEOID", by.y = "trtid10")
+# 2000 (drops 2016 to 843 obs.)
+new00 <- new00[c(1,2)]
+pov16 <- merge(pov16, new00, by.x = "GEOID", by.y = "trtid10")
+# 2010 (drops 2016 to 834 obs.)
+setwd("D:/alarson/SuburbanizationPoverty/CensusData")
+trct10 <- st_read("./US_tract_2010.shp",
+                  stringsAsFactors = FALSE) 
+trct10 <- trct10[c("GEOID10", "GISJOIN")]
+pov10 <- as.data.frame(as_Spatial(pov10))
+pov10 <- merge(pov10, trct10, by = "GISJOIN")
+pov10 <- pov10[c(3,6)]
+pov16 <- merge(pov16, pov10, by.x = "GEOID", by.y = "GEOID10")
+
+# trct % chg base90
+pov16$base90_00 <- (pov16$pct199_00 - pov16$pct199_90) / pov16$pct199_90 * 100
+pov16$base90_10 <- (pov16$pct199_10 - pov16$pct199_90) / pov16$pct199_90 * 100
+pov16$base90_16 <- (pov16$pct199_16 - pov16$pct199_90) / pov16$pct199_90 * 100
+
+# st_write(pov16, "tsData.shp")
+
+# "Time series"
+pov16 <- as.data.frame(as_Spatial(pov16))
+pov16L <- reshape(pov16, varying = c("pct199_90",
+                                     "pct199_00",
+                                     "pct199_10",
+                                     "pct199_16"),
+                  direction = "long", idvar = "GEOID", sep = "_")
+pov16L$time <- recode(pov16L$time, "90 = 1990; 00 = 2000; 10 = 2010; 16 = 2016")
+
+ggplot(pov16L, aes(x = time, y = pct199, group = GEOID)) +
+  geom_line() +
+  theme_minimal() +
+  labs(title = "title",
+       subtitle = "Individuals making less than 200% FPL,\nor $48,500 for a family of four in 2016.",
+       y = "Percentage low-income residents")
+# plot out data on map, collapse in ways that make sense, account for 10 and 16 MOEs
