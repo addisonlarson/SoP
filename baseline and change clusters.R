@@ -44,7 +44,7 @@ myCols <- c(rgb(101,129,102, maxColorValue = 255),
             rgb(79,157,193, maxColorValue = 255),
             rgb(170,216,224, maxColorValue = 255),
             rgb(230,230,230, maxColorValue = 255))
-tiff("tractGroupings.tiff", units = "in", width = 10, height = 8, res = 600, compression = "lzw")
+# tiff("tractGroupings.tiff", units = "in", width = 10, height = 8, res = 600, compression = "lzw")
 ggplot(attrib, aes(x = pct199_16, y = base90_16, color = Group)) +
   geom_point() + theme_minimal() +
   scale_color_manual(values = myCols) +
@@ -52,7 +52,7 @@ ggplot(attrib, aes(x = pct199_16, y = base90_16, color = Group)) +
        subtitle = "Low-income is defined as households with incomes below 200% of the Federal Poverty Level.",
        y = "Rate of Change in Low-Income Residents, 1990-2016",
        x = "Percentage Low-Income Residents, 2016")
-dev.off()
+# dev.off()
 
 # simplified groups for stakeholder presentation
 # 1 = "Rapid increase in low-income households"
@@ -76,4 +76,19 @@ tsSimp$simpGroup <- factor(tsSimp$simpGroup, levels = c("Rapid increase in low-i
                                                         "Persistent and growing poverty",
                                                         "Lower-income neighborhoods with little change",
                                                         "Higher-income neighborhoods with little change"))
-# st_write(ts, "./tsDataSimpGroups.shp")
+# st_write(tsSimp, "./tsDataSimpGroups.shp")
+attribSimp <- tsSimp %>% st_set_geometry(NULL)
+attribSimp$Group <- attribSimp$simpGroup
+myCols <- c(rgb(152,182,153, maxColorValue = 255),
+            rgb(79,157,193, maxColorValue = 255),
+            rgb(170,216,224, maxColorValue = 255),
+            rgb(200,231,201, maxColorValue = 255))
+# tiff("tractGroupingsSimp.tiff", units = "in", width = 10, height = 8, res = 600, compression = "lzw")
+ggplot(attribSimp, aes(x = pct199_16, y = base90_16, color = Group)) +
+  geom_point() + theme_minimal() +
+  scale_color_manual(values = myCols) +
+  labs(title = "Census tract typologies",
+       subtitle = "Low-income is defined as households with incomes below 200% of the Federal Poverty Level.",
+       y = "Rate of Change in Low-Income Residents, 1990-2016",
+       x = "Percentage Low-Income Residents, 2016")
+# dev.off()
