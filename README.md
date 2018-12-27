@@ -11,7 +11,7 @@ Until we come up with a better name, I'm using the uninformative abbreviation of
 ## Goals
 
 - [x] Download and prep Census data on low-income residents (defined as below 200% of the Federal Poverty Level) for 1990, 2000, 2010, 2017
-- [ ] Incorporate basic data on population change
+- [x] Incorporate basic data on population change
 - [x] Clean data s.t. a maximum number of tracts are preserved over the study period
 - [ ] Harmonize census tract boundaries to 2010 boundaries
 - [ ] Identify clusters of absolute percentage low-income residents :heavy_multiplication_x: percentage change low-income residents
