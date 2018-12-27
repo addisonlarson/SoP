@@ -2,8 +2,9 @@
 # 1. Clean tabular data 1990, 2000, 2010, 2017
 # 2. Join 1990, 2000, and 2010 data to contemporaneous shapefiles
 #    (2017 includes spatial spatial data in download)
-# 3. Export
-require(here); require(sf); require(dplyr); require(tidycensus)
+# 3. Export shapefiles
+# 4. Prep tabular data to use with LTDB
+require(here); require(sf); require(dplyr); require(tidycensus); require(stringr)
 options(stringsAsFactors = FALSE)
 
 # 1. Clean tabular data 1990, 2000, 2010, 2017
@@ -20,11 +21,12 @@ dat <- read.csv(here("data", "nhgis0006_ts_nominal_tract.csv")) %>%
          tot200_c = C20AI125) %>%
   mutate(tot199_a = univ_a - tot200_a,
          tot199_b = univ_b - tot200_b,
-         tot199_c = univ_c - tot200_c) %>%
+         tot199_c = univ_c - tot200_c,
+         GEOID = paste0(STATEFP, str_pad(COUNTYFP, 3, "left", "0"), TRACTA)) %>%
   filter(xwalk %in% c("34_5", "34_7", "34_15",
                       "34_21", "42_17", "42_29",
                       "42_45", "42_91", "42_101")) %>%
-  select(1:4, ends_with("_a"), ends_with("_b"), ends_with("_c")) %>%
+  select(1:4, GEOID, ends_with("_a"), ends_with("_b"), ends_with("_c")) %>%
   mutate(li_a = tot199_a / univ_a,
          li_b = tot199_b / univ_b,
          li_c = tot199_c / univ_c,
@@ -61,23 +63,33 @@ trct_a <- st_read(here("data", "./US_tract_1990_conflated.shp")) %>%
   select(GISJOIN) %>%
   left_join(., dat_a, by = c("GISJOIN" = "GJOIN1990")) %>%
   filter(GISJOIN %in% dat_a$GJOIN1990) %>%
-  select(1:4, ends_with("_a")) %>%
+  select(1:5, ends_with("_a")) %>%
   st_transform(., 26918)
 trct_b <- st_read(here("data", "./US_tract10_2000.shp")) %>%
   select(GISJOIN) %>%
   filter(GISJOIN %in% dat_b$GJOIN2000) %>%
   left_join(., dat_b, by = c("GISJOIN" = "GJOIN2000")) %>%
-  select(1:4, ends_with("_b")) %>%
+  select(1:5, ends_with("_b")) %>%
   st_transform(., 26918)
 trct_c <- st_read(here("data", "./US_tract_2010.shp")) %>%
   select(GISJOIN) %>%
   left_join(., dat_c, by = c("GISJOIN" = "GJOIN2012")) %>%
   filter(GISJOIN %in% dat_c$GJOIN2000) %>%
-  select(1:4, ends_with("_c")) %>%
+  select(1:5, ends_with("_c")) %>%
   st_transform(., 26918)
   
-# 3. Export
+# 3. Export shapefiles
 st_write(trct_a, here("outputs", "shp_a.shp"))
 st_write(trct_b, here("outputs", "shp_b.shp"))
 st_write(trct_c, here("outputs", "shp_c.shp"))
 st_write(trct_d, here("outputs", "shp_d.shp"))
+
+# 4. Prep tabular data to use with LTDB
+orig_a <- trct_a %>%
+  select(5:10) %>%
+  st_set_geometry(NULL)
+orig_b <- trct_b %>%
+  select(5:10) %>%
+  st_set_geometry(NULL)
+write.csv(orig_a, here("outputs", "orig_a.csv"), row.names = FALSE)
+write.csv(orig_b, here("outputs", "orig_b.csv"), row.names = FALSE)
