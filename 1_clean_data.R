@@ -15,14 +15,14 @@ dat <- read.csv(here("data", "nhgis0006_ts_nominal_tract.csv")) %>%
   mutate(xwalk = paste(STATEFP, COUNTYFP, sep = "_"),
          univ_a = rowSums(select(., seq(15, 39, 3))),
          univ_b = rowSums(select(., seq(16, 40, 3))),
-         univ_c = rowSums(select(., seq(17, 41, 3)))) %>%
-  rename(tot200_a = C20AI1990,
-         tot200_b = C20AI2000,
-         tot200_c = C20AI125) %>%
-  mutate(tot199_a = univ_a - tot200_a,
+         univ_c = rowSums(select(., seq(17, 41, 3))),
+         tot199_a = univ_a - tot200_a,
          tot199_b = univ_b - tot200_b,
          tot199_c = univ_c - tot200_c,
          GEOID = paste0(STATEFP, str_pad(COUNTYFP, 3, "left", "0"), TRACTA)) %>%
+  rename(tot200_a = C20AI1990,
+         tot200_b = C20AI2000,
+         tot200_c = C20AI125) %>%
   filter(xwalk %in% c("34_5", "34_7", "34_15",
                       "34_21", "42_17", "42_29",
                       "42_45", "42_91", "42_101")) %>%
