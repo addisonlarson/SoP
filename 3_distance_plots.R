@@ -54,6 +54,10 @@ lixd_full <- bind_rows(lixd_a, lixd_b) %>%
   bind_rows(., lixd_c) %>%
   bind_rows(., lixd_d) %>%
   mutate_at(vars(matches("yr")), as.factor)
+overall_trend <- lixd_full %>%
+  mutate(yr = "Average")
+lixd_full <- lixd_full %>% bind_rows(., overall_trend) %>%
+  mutate_at(vars(matches("yr")), as.factor)
 
 # Reshape data for grouping by percentage low-income and distance from Center City
 lixdr_a <- lixd_a %>% select(pct_cat, dist_cat) %>%
@@ -113,8 +117,11 @@ ggplot(lixd_d, aes(x = dist, y = pct)) + geom_point(color = dot_blue) +
        y = "Percentage Low-Income Residents")
 ggsave(here("figures", "lixd_d.png"), dpi = 500)
 
-ggplot(lixd_full, aes(x = dist, y = pct, color = yr)) + geom_smooth(se = FALSE) +
-  scale_color_brewer(palette = "Blues") +
+line_blue <- c(brewer.pal(5, "Blues")[2:5], "darkolivegreen4")
+ggplot(lixd_full, aes(x = dist, y = pct, color = yr)) +
+  geom_smooth(data = subset(lixd_full, yr == "Average"), show.legend = FALSE, fill = "darkolivegreen4") +
+  geom_smooth(se = FALSE) +
+  scale_color_manual(values = line_blue)  +
   labs(title = "Tract Distance to City Hall by Percentage Low-Income Residents",
        x = "Distance to City Hall (mi.)",
        y = "Percentage Low-Income Residents",
