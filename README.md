@@ -1,5 +1,5 @@
 # SoP
-income and poverty trends in the Delaware Valley 1990-2016
+income and poverty trends in the Delaware Valley 1990-2017
 
 **About the title** The original title of this project was "Suburbanization of Poverty," which is problematic for at least two reasons:
 
@@ -19,5 +19,5 @@ Until we come up with a better name, I'm using the uninformative abbreviation of
 - [ ] Test for statistically significant changes where possible
 - [ ] Percentage of low-income residents and percentage change relative to county and relative to region
 - [ ] Create maps of absolute and relative percentage change with MCD labeling
-- [ ] Percentage of low-income residents (*y*) by distance (*x*)
+- [x] Percentage of low-income residents (*y*) by distance to Center City (*x*)
 - [ ] Incorporate objective measures of school quality, housing prices, affordable housing development, and health indicators
