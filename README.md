@@ -15,7 +15,7 @@ Until we come up with a better name, I'm using the uninformative abbreviation of
 - [x] Clean data s.t. a maximum number of tracts are preserved over the study period
 - [ ] Harmonize census tract boundaries to 2010 boundaries
 - [ ] Identify clusters of absolute percentage low-income residents * percentage change low-income residents
-- [ ] Evaluate coefficients of variation for 2010 and 2017 ACS estimates
+- [x] Evaluate coefficients of variation for 2017 ACS estimates
 - [ ] Test for statistically significant changes where possible
 - [ ] Percentage of low-income residents and percentage change relative to county and relative to region
 - [ ] Create maps of absolute and relative percentage change with MCD labeling
