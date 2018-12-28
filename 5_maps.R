@@ -18,38 +18,39 @@ eq_int = c(-0.0001,0.2,0.4,0.6,0.8,1.0001)
 # 1990 Census
 png(here("figures", "li_a.png"), width = 10, height = 7.5, units = "in", res = 500)
 plot(shp_a["li_a"], breaks = eq_int, key.pos = 1,
-     pal = brewer.pal(5, "PuBuGn"),
+     pal = brewer.pal(5, "Blues"),
      border = NA, main = "Pct Low-Income Residents, 1990", reset = FALSE)
-plot(st_geometry(mcd), col = "dimgray", add = TRUE)
+plot(st_geometry(mcd), col = "gray", add = TRUE)
 dev.off()
 
 # 2000 Census
 png(here("figures", "li_b.png"), width = 10, height = 7.5, units = "in", res = 500)
 plot(shp_b["li_b"], breaks = eq_int, key.pos = 1,
-     pal = brewer.pal(5, "PuBuGn"),
+     pal = brewer.pal(5, "Blues"),
      border = NA, main = "Pct Low-Income Residents, 2000", reset = FALSE)
-plot(st_geometry(mcd), col = "dimgray", add = TRUE)
+plot(st_geometry(mcd), col = "gray", add = TRUE)
 dev.off()
 
 # 2012 ACS
 png(here("figures", "li_c.png"), width = 10, height = 7.5, units = "in", res = 500)
 plot(shp_c["li_c"], breaks = eq_int, key.pos = 1,
-     pal = brewer.pal(5, "PuBuGn"),
+     pal = brewer.pal(5, "Blues"),
      border = NA, main = "Pct Low-Income Residents, 2010", reset = FALSE)
-plot(st_geometry(mcd), col = "dimgray", add = TRUE)
+plot(st_geometry(mcd), col = "gray", add = TRUE)
 dev.off()
 
 # 2017 ACS
 png(here("figures", "li_d.png"), width = 10, height = 7.5, units = "in", res = 500)
 plot(shp_d["li_d"], breaks = eq_int, key.pos = 1,
-     pal = brewer.pal(5, "PuBuGn"),
+     pal = brewer.pal(5, "Blues"),
      border = NA, main = "Pct Low-Income Residents, 2017", reset = FALSE)
-plot(st_geometry(mcd), col = "dimgray", add = TRUE)
+plot(st_geometry(mcd), col = "gray", add = TRUE)
 dev.off()
 
 # 2017 ACS data reliability
+fill_blue <- rev(brewer.pal(3, "Blues"))
 png(here("figures", "cv_d.png"), width = 10, height = 7.5, units = "in", res = 500)
-plot(cv_d["cat_li"], pal = c("#9EBC9F", "#E5EAEB", "#B9A394"),
+plot(cv_d["cat_li"], pal = fill_blue,
      key.pos = 1, border = NA, main = "Reliability of Estimate", reset = FALSE)
-plot(st_geometry(mcd), col = "dimgray", add = TRUE)
+plot(st_geometry(mcd), col = "white", add = TRUE)
 dev.off()
