@@ -1,5 +1,5 @@
 require(here); require(sf); require(dplyr); require(RColorBrewer)
-require(units); require(ggplot2); require(reshape2)
+require(units); require(ggplot2); require(reshape2); require(magrittr)
 theme_set(theme_minimal())
 # Upload required files + reclass percentage low-income
 dens <- c(-Inf, 0.1, 0.35, 0.6, Inf)
@@ -45,7 +45,17 @@ lixd_c <- tibble(pct_cat = shp_c$li_cat_c, pct = shp_c$li_c, dist = dist_c)%>%
 lixd_d <- tibble(pct_cat = shp_d$li_cat_d, pct = shp_d$li_d, dist = dist_d)%>%
   mutate(dist_cat = cut(dist, breaks = dens, labels = dens_labs))
 
-# Reshape data
+# Reshape data for plotting on single chart
+lixd_a %<>% mutate(yr = 1990)
+lixd_b %<>% mutate(yr = 2000)
+lixd_c %<>% mutate(yr = 2010)
+lixd_d %<>% mutate(yr = 2017)
+lixd_full <- bind_rows(lixd_a, lixd_b) %>%
+  bind_rows(., lixd_c) %>%
+  bind_rows(., lixd_d) %>%
+  mutate_at(vars(matches("yr")), as.factor)
+
+# Reshape data for grouping by percentage low-income and distance from Center City
 lixdr_a <- lixd_a %>% select(pct_cat, dist_cat) %>%
   count(pct_cat, dist_cat) %>%
   na.omit(.) %>%
@@ -102,6 +112,14 @@ ggplot(lixd_d, aes(x = dist, y = pct)) + geom_point(color = dot_blue) +
        x = "Distance to City Hall (mi.)",
        y = "Percentage Low-Income Residents")
 ggsave(here("figures", "lixd_d.png"), dpi = 500)
+
+ggplot(lixd_full, aes(x = dist, y = pct, color = yr)) + geom_smooth(se = FALSE) +
+  scale_color_brewer(palette = "Blues") +
+  labs(title = "Tract Distance to City Hall by Percentage Low-Income Residents",
+       x = "Distance to City Hall (mi.)",
+       y = "Percentage Low-Income Residents",
+       color = "Year")
+ggsave(here("figures", "lixd_full.png"), dpi = 500)
 
 # Categorical
 ggplot(lixdr_a, aes(fill = pct_cat, y = freq, x = dist_cat)) +
