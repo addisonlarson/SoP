@@ -4,7 +4,8 @@
 #    (2017 includes spatial spatial data in download)
 # 3. Export shapefiles
 # 4. Prep tabular data to use with LTDB
-require(here); require(sf); require(dplyr); require(tidycensus); require(stringr)
+require(here); require(sf); require(dplyr);
+require(tidycensus); require(stringr); require(tigris)
 options(stringsAsFactors = FALSE)
 
 # 1. Clean tabular data 1990, 2000, 2010, 2017
@@ -14,30 +15,35 @@ dat <- read.csv(here("data", "nhgis0006_ts_nominal_tract.csv")) %>%
   select(-ends_with("M")) %>%
   mutate(xwalk = paste(STATEFP, COUNTYFP, sep = "_"),
          univ_a = rowSums(select(., seq(15, 39, 3))),
-         univ_b = rowSums(select(., seq(16, 40, 3))),
-         univ_c = rowSums(select(., seq(17, 41, 3)))) %>%
+         univ_b = rowSums(select(., seq(16, 40, 3)))) %>%
   rename(tot200_a = C20AI1990,
-         tot200_b = C20AI2000,
-         tot200_c = C20AI125) %>%
+         tot200_b = C20AI2000) %>%
   mutate(tot199_a = univ_a - tot200_a,
          tot199_b = univ_b - tot200_b,
-         tot199_c = univ_c - tot200_c,
          GEOID = paste0(STATEFP, str_pad(COUNTYFP, 3, "left", "0"), TRACTA)) %>%
   filter(xwalk %in% c("34_5", "34_7", "34_15",
                       "34_21", "42_17", "42_29",
                       "42_45", "42_91", "42_101")) %>%
-  select(1:4, GEOID, ends_with("_a"), ends_with("_b"), ends_with("_c")) %>%
+  select(1:4, GEOID, ends_with("_a"), ends_with("_b")) %>%
   mutate(li_a = tot199_a / univ_a,
          li_b = tot199_b / univ_b,
-         li_c = tot199_c / univ_c,
          hi_a = 1 - li_a,
-         hi_b = 1 - li_b,
-         hi_c = 1 - li_c)
+         hi_b = 1 - li_b)
 
 # Separate by year
 dat_a <- dat %>% filter(GJOIN1990 != "")
 dat_b <- dat %>% filter(GJOIN2000 != "")
-dat_c <- dat %>% filter(GJOIN2012 != "")
+
+# 2010 ACS data from American FactFinder (table not on API)
+dat_c <- read.csv(here("data", "ACS_12_5YR_S1701_with_ann.csv")) %>%
+  rename(univ_c = HC01_EST_VC01,
+         tot199_c = HC01_EST_VC55,
+         GEOID = GEO.id2) %>%
+  mutate(tot200_c = univ_c - tot199_c,
+         li_c = tot199_c / univ_c,
+         hi_c = 1 - li_c) %>%
+  select(GEOID, ends_with("_c")) %>%
+  mutate_at(vars(matches("GEOID")), as.character)
 
 # 2017 ACS data from Census API
 trct_d <- get_acs(geography = "tract",
@@ -71,13 +77,10 @@ trct_b <- st_read(here("data", "./US_tract10_2000.shp")) %>%
   left_join(., dat_b, by = c("GISJOIN" = "GJOIN2000")) %>%
   select(1:5, ends_with("_b")) %>%
   st_transform(., 26918)
-trct_c <- st_read(here("data", "./US_tract_2010.shp")) %>%
-  select(GISJOIN) %>%
-  left_join(., dat_c, by = c("GISJOIN" = "GJOIN2012")) %>%
-  filter(GISJOIN %in% dat_c$GJOIN2012) %>%
-  select(1:5, ends_with("_c")) %>%
-  st_transform(., 26918)
-  
+trct_c <- trct_d %>%
+  select(GEOID) %>%
+  left_join(., dat_c, by = "GEOID")
+
 # 3. Export shapefiles
 st_write(trct_a, here("outputs", "shp_a.shp"))
 st_write(trct_b, here("outputs", "shp_b.shp"))
