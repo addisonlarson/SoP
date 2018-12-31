@@ -2,10 +2,13 @@
 # 1. Clean tabular data 1990, 2000, 2010, 2017
 # 2. Join 1990, 2000, and 2010 data to contemporaneous shapefiles
 #    (2017 includes spatial spatial data in download)
-# 3. Export shapefiles
-# 4. Prep tabular data to use with LTDB
+# 3. Prep tabular data to use with LTDB
+# 4. Compute percentage low-income persons relative to county
+# 5. Compute percentage low-income persons relative to region
+# 6. Export shapefiles
+
 require(here); require(sf); require(dplyr);
-require(tidycensus); require(stringr); require(tigris)
+require(tidycensus); require(stringr); require(magrittr)
 options(stringsAsFactors = FALSE)
 
 # 1. Clean tabular data 1990, 2000, 2010, 2017
@@ -81,12 +84,6 @@ trct_c <- trct_d %>%
   select(GEOID) %>%
   left_join(., dat_c, by = "GEOID")
 
-# 3. Export shapefiles
-st_write(trct_a, here("outputs", "shp_a.shp"))
-st_write(trct_b, here("outputs", "shp_b.shp"))
-st_write(trct_c, here("outputs", "shp_c.shp"))
-st_write(trct_d, here("outputs", "shp_d.shp"))
-
 # 4. Prep tabular data to use with LTDB
 orig_a <- trct_a %>%
   select(5:10) %>%
@@ -96,3 +93,44 @@ orig_b <- trct_b %>%
   st_set_geometry(NULL)
 write.csv(orig_a, here("outputs", "orig_a.csv"), row.names = FALSE)
 write.csv(orig_b, here("outputs", "orig_b.csv"), row.names = FALSE)
+
+# 2. Compute percentage low-income persons relative to county
+cty_li <- get_acs(geography = "county",
+                  state = c(34,42),
+                  variables = c("S1701_C01_001E",
+                                "S1701_C01_042E"),
+                  output = "wide") %>%
+  mutate(xwalk = paste(substr(GEOID, 1, 2), as.numeric(substr(GEOID, 3, 5)), sep = "_")) %>%
+  filter(xwalk %in% c("34_5", "34_7", "34_15",
+                      "34_21", "42_17", "42_29",
+                      "42_45", "42_91", "42_101")) %>%
+  rename(tot199_d = S1701_C01_042E) %>%
+  mutate(cty_li = tot199_d / S1701_C01_001E,
+         cty = substr(GEOID, 3, 5)) %>%
+  select(cty, cty_li)
+# Ratio of tract li to county li
+trct_d %<>% mutate(cty = substr(GEOID, 3, 5)) %>%
+  left_join(., cty_li) %>%
+  mutate(rel_li = li_d / cty_li)
+# z-score of tract li to county li
+cty_sd <- trct_d %>%
+  group_by(cty) %>%
+  summarize(cty_sd = sd(li_d, na.rm = TRUE)) %>%
+  st_set_geometry(NULL)
+trct_d %<>% left_join(., cty_sd) %>%
+  mutate(z = (li_d - cty_li) / cty_sd,
+         z_cat = cut(z, breaks = c(-Inf, -1.5, -0.5, 0.5, 1.5, Inf)))
+
+# 3. Compute percentage low-income persons relative to region
+reg_li <- weighted.mean(trct_d$li_d, trct_d$univ_d)
+reg_sd <- sd(trct_d$li_d, na.rm = TRUE)
+trct_d %<>%
+  mutate(rel_li_reg = li_d / reg_li,
+         z_reg = (li_d - reg_li) / reg_sd,
+         z_cat_reg = cut(z_reg, breaks = c(-Inf, -1.5, -0.5, 0.5, 1.5, Inf)))
+
+# 3. Export shapefiles
+st_write(trct_a, here("outputs", "shp_a.shp"))
+st_write(trct_b, here("outputs", "shp_b.shp"))
+st_write(trct_c, here("outputs", "shp_c.shp"))
+st_write(trct_d, here("outputs", "shp_d.shp"))

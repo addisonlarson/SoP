@@ -2,9 +2,7 @@ require(here); require(sf); require(dplyr); require(magrittr)
 require(RColorBrewer); require(forcats); require(tidycensus)
 options(stringsAsFactors = FALSE)
 # 1. Upload req'd files
-# 2. Compute percentage low-income persons relative to county
-# 3. Compute percentage low-income persons relative to region
-# 4. Export plots
+# 2. Export plots
 
 # 1. Upload req'd files
 mcd <- st_read(here("data", "./mcd.shp")) %>% # MCD boundary
@@ -13,45 +11,14 @@ shp_a <- st_read(here("outputs", "./shp_a.shp")) # 1990 Census data
 shp_b <- st_read(here("outputs", "./shp_b.shp")) # 2000 Census data
 shp_c <- st_read(here("outputs", "./shp_c.shp")) # 2012 ACS data (2010 midpoint)
 shp_d <- st_read(here("outputs", "./shp_d.shp")) # 2017 ACS data
-cv_d <- st_read(here("outputs", "./cv_d.shp")) %>% # 2017 ACS data reliability
+cv_c <- st_read(here("outputs", "./cv_c.shp")) %>% # 2012 ACS data reliability
   mutate(cat_li = fct_relevel(cat_li, "High", "Medium", "Low"))
+cv_d <- st_read(here("outputs", "./cv_d.shp")) %>% # 2017 ACS data reliability
+  mutate(cat_li = fct_relevel(cat_li, "High", "Medium", "Low"),
+         z_dif_sig = fct_relevel(z_dif_sig, "Yes", "No"),
+         z_1dir_sig = fct_relevel(z_1dir_sig, "Yes", "No"))
 
-# 2. Compute percentage low-income persons relative to county
-cty_li <- get_acs(geography = "county",
-        state = c(34,42),
-        variables = c("S1701_C01_001E",
-                      "S1701_C01_042E"),
-        output = "wide") %>%
-  mutate(xwalk = paste(substr(GEOID, 1, 2), as.numeric(substr(GEOID, 3, 5)), sep = "_")) %>%
-  filter(xwalk %in% c("34_5", "34_7", "34_15",
-                      "34_21", "42_17", "42_29",
-                      "42_45", "42_91", "42_101")) %>%
-  rename(tot199_d = S1701_C01_042E) %>%
-  mutate(cty_li = tot199_d / S1701_C01_001E,
-         cty = substr(GEOID, 3, 5)) %>%
-  select(cty, cty_li)
-# Ratio of tract li to county li
-shp_d %<>% mutate(cty = substr(GEOID, 3, 5)) %>%
-  left_join(., cty_li) %>%
-  mutate(rel_li = li_d / cty_li)
-# z-score of tract li to county li
-cty_sd <- shp_d %>%
-  group_by(cty) %>%
-  summarize(cty_sd = sd(li_d, na.rm = TRUE)) %>%
-  st_set_geometry(NULL)
-shp_d %<>% left_join(., cty_sd) %>%
-  mutate(z = (li_d - cty_li) / cty_sd,
-         z_cat = cut(z, breaks = c(-Inf, -1.5, -0.5, 0.5, 1.5, Inf)))
-
-# 3. Compute percentage low-income persons relative to region
-reg_li <- weighted.mean(shp_d$li_d, shp_d$univ_d)
-reg_sd <- sd(shp_d$li_d, na.rm = TRUE)
-shp_d %<>%
-  mutate(rel_li_reg = li_d / reg_li,
-         z_reg = (li_d - reg_li) / reg_sd,
-         z_cat_reg = cut(z_reg, breaks = c(-Inf, -1.5, -0.5, 0.5, 1.5, Inf)))
-
-# 4. Export plots
+# 2. Export plots
 eq_int = c(-0.0001,0.2,0.4,0.6,0.8,1.0001)
 
 # 1990 Census
@@ -78,6 +45,14 @@ plot(shp_c["li_c"], breaks = eq_int, key.pos = 1,
 plot(st_geometry(mcd), col = "gray", add = TRUE)
 dev.off()
 
+# 2012 ACS data reliability
+fill_blue <- rev(brewer.pal(4, "Blues"))[2:4]
+png(here("figures", "cv_c.png"), width = 10, height = 7.5, units = "in", res = 500)
+plot(cv_c["cat_li"], pal = fill_blue,
+     key.pos = 1, border = NA, main = "Reliability of Estimate, 2010", reset = FALSE)
+plot(st_geometry(mcd), col = "gray", add = TRUE)
+dev.off()
+
 # 2017 ACS
 png(here("figures", "li_d.png"), width = 10, height = 7.5, units = "in", res = 500)
 plot(shp_d["li_d"], breaks = eq_int, key.pos = 1,
@@ -87,11 +62,31 @@ plot(st_geometry(mcd), col = "gray", add = TRUE)
 dev.off()
 
 # 2017 ACS data reliability
-fill_blue <- rev(brewer.pal(3, "Blues"))
+fill_blue <- rev(brewer.pal(4, "Blues"))[2:4]
 png(here("figures", "cv_d.png"), width = 10, height = 7.5, units = "in", res = 500)
 plot(cv_d["cat_li"], pal = fill_blue,
-     key.pos = 1, border = NA, main = "Reliability of Estimate", reset = FALSE)
-plot(st_geometry(mcd), col = "white", add = TRUE)
+     key.pos = 1, border = NA, main = "Reliability of Estimate, 2017", reset = FALSE)
+plot(st_geometry(mcd), col = "gray", add = TRUE)
+dev.off()
+
+# Statistically significant change ACS 2012-2017
+fill_blue <- rev(brewer.pal(4, "Blues"))[3:4]
+png(here("figures", "sig_chg_qual.png"), width = 10, height = 7.5, units = "in", res = 500)
+plot(cv_d["z_dif_sig"], pal = fill_blue,
+     key.pos = 1, border = NA,
+     main = expression(paste("Significant Change in Pct. Low-Income Residents, 2010-2017, ", alpha, " = 0.05")),
+     reset = FALSE)
+plot(st_geometry(mcd), col = "gray", add = TRUE)
+dev.off()
+
+# Statistically significant increase ACS 2012-2017
+fill_blue <- rev(brewer.pal(4, "Blues"))[3:4]
+png(here("figures", "stat_inc_qual.png"), width = 10, height = 7.5, units = "in", res = 500)
+plot(cv_d["z_1dir_sig"], pal = fill_blue,
+     key.pos = 1, border = NA,
+     main = expression(paste("Significant Increase in Pct. Low-Income Residents, 2010-2017, ", alpha, " = 0.05")),
+     reset = FALSE)
+plot(st_geometry(mcd), col = "gray", add = TRUE)
 dev.off()
 
 # 2017 ACS LI relative to county, ratio

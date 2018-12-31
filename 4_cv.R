@@ -35,6 +35,24 @@ cv_d <- get_acs(geography = "tract",
   select(GEOID, ends_with("li")) %>%
   st_transform(., 26918)
 
+# Test for statistically significant differences
+cv_c %<>%
+  mutate(num_c = li,
+         denom_c = (moe_li / 1.645) ^ 2)
+cv_d %<>%
+  mutate(num_d = li,
+         denom_d = (moe_li / 1.645) ^ 2)
+z_1dir <- (cv_d$num_d - cv_c$num_c) / sqrt(cv_d$denom_d + cv_c$denom_c)
+cv_c %<>%
+  mutate(z_1dir = z_1dir,
+         z_dif = abs(z_1dir),
+         z_dif_sig = ifelse(z_dif > 1.96, "Yes", "No"))
+cv_d %<>%
+  mutate(z_1dir = z_1dir,
+         z_dif = abs(z_1dir),
+         z_dif_sig = ifelse(z_dif > 1.96, "Yes", "No"),
+         z_1dir_sig = ifelse(z_1dir > 1.96, "Yes", "No")) # Indicates if stat sig increase 2012-2017
+
 # Export
 st_write(cv_c, here("outputs", "cv_c.shp"))
 st_write(cv_d, here("outputs", "cv_d.shp"))
