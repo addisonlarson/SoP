@@ -37,4 +37,4 @@ cluster$group <- as.factor(mod$classification)
 # 4. Export
 st_write(trct_a_h, here("outputs", "shp_a_h.shp"))
 st_write(trct_b_h, here("outputs", "shp_b_h.shp"))
-st_write(cluster, here("outputs", "clusters.shp"))
+st_write(cluster, here("outputs", "cluster.shp"))

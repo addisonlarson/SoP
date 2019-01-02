@@ -17,6 +17,7 @@ cv_d <- st_read(here("outputs", "./cv_d.shp")) %>% # 2017 ACS data reliability
   mutate(cat_li = fct_relevel(cat_li, "High", "Medium", "Low"),
          z_dif_sig = fct_relevel(z_dif_sig, "Yes", "No"),
          z_1dir_sig = fct_relevel(z_1dir_sig, "Yes", "No"))
+cluster <- st_read(here("outputs", "./cluster.shp")) # Baseline x change clusters
 
 # 2. Export plots
 eq_int = c(-0.0001,0.2,0.4,0.6,0.8,1.0001)
@@ -123,4 +124,14 @@ plot(shp_d["z_cat_reg"], pal = fill_blue,
      main = expression("Low-Income Residents Relative to Regional Mean, "*italic(z)*"-Scores, 2017"),
      reset = FALSE)
 plot(st_geometry(mcd), col = "white", add = TRUE)
+dev.off()
+
+# Clusters
+fill_blue <- brewer.pal(7, "Blues")
+png(here("figures", "clusters.png"), width = 10, height = 7.5, units = "in", res = 500)
+plot(cluster["group"], pal = fill_blue,
+     key.pos = 1, border = NA,
+     main = "(DRAFT) Clusters by 2017 Pct. LI and 1990-2017 Pct. Chg. LI",
+     reset = FALSE)
+plot(st_geometry(mcd), col = "gray", add = TRUE)
 dev.off()
