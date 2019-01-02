@@ -13,8 +13,8 @@ Until we come up with a better name, I'm using the uninformative abbreviation of
 - [x] Download and prep Census data on low-income residents (defined as below 200% of the Federal Poverty Level) for 1990, 2000, 2010, 2017
 - [x] Incorporate basic data on population change
 - [x] Clean data s.t. a maximum number of tracts are preserved over the study period
-- [ ] Harmonize census tract boundaries to 2010 boundaries
-- [ ] Identify clusters of absolute percentage low-income residents * percentage change low-income residents
+- [x] Harmonize census tract boundaries to 2010 boundaries
+- [x] Identify clusters of absolute percentage low-income residents * percentage change low-income residents
 - [x] Evaluate coefficients of variation for 2012 and 2017 ACS 5-year estimates
 - [x] Test for statistically significant changes where possible
 - [ ] Percentage of low-income residents and percentage change relative to county and relative to region
