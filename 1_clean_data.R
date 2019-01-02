@@ -23,7 +23,7 @@ dat <- read.csv(here("data", "nhgis0006_ts_nominal_tract.csv")) %>%
          tot200_b = C20AI2000) %>%
   mutate(tot199_a = univ_a - tot200_a,
          tot199_b = univ_b - tot200_b,
-         GEOID = paste0(STATEFP, str_pad(COUNTYFP, 3, "left", "0"), TRACTA)) %>%
+         GEOID = paste0(STATEFP, str_pad(COUNTYFP, 3, "left", "0"), str_pad(TRACTA, 6, "left", "0"))) %>%
   filter(xwalk %in% c("34_5", "34_7", "34_15",
                       "34_21", "42_17", "42_29",
                       "42_45", "42_91", "42_101")) %>%
