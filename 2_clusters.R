@@ -32,27 +32,56 @@ cluster <- left_join(trct_d, dat) %>%
 cluster_df <- cluster %>% st_set_geometry(NULL)
 
 # 3. Identify clusters
+# 3a. Clusters of estimates
 mod <- Mclust(cluster_df[c(2,3)])
 summary(mod, parameters = TRUE)
 plot(mod, what = "BIC"); plot(mod, what = "density", type = "persp")
 cluster$group <- as.factor(mod$classification)
 
-# TEST: Simulate percentages using MOE
+# 3b. Simulate percentages using MOE
 # Compute clusters across several iterations
 # Determine best clustering scheme when accounting for MOE
-probs <- function(i){rnorm(1, mean = cluster_df[,2], sd = cluster_df[,4] / 1.645)}
+# Once find best model, use Mclust to append group classification
+# WARNING: This takes several hours to run
+cluster_df <- left_join(trct_d, dat) %>%
+  mutate(change = (li_d - li_a) / li_a) %>%
+  filter_all(., all_vars(. != -1)) %>%
+  slice(-1365) %>%
+  st_set_geometry(NULL)
+
+probs <- function(i){rnorm(1, mean = cluster_df[,2], sd = cluster_df[,3] / 1.645)}
 # sim = simulated; sel_sim = selected simulations; res = results
 sim <- matrix(nrow = 1364, ncol = 1000)
-sel_sim <- matrix(nrow = 1364, ncol = 2); sel_sim[,2] <- cluster_df$change
-res <- list()
+sel_sim <- matrix(nrow = 1364, ncol = 2)
+res <- matrix(nrow = ncol(sim), ncol = 2)
 for(i in 1:ncol(sim)){
-  sim[,i] <- apply(cluster_df, 1, probs)
+  sim[,i] <- apply(cluster_df, 1, probs) # simulated baseline
   sel_sim[,1] <- sim[,i]
-  mod <- mclustBIC(sel_sim[,1:2], verbose = FALSE)
-  res[[i]] <- mod
+  sel_sim[,2] <- (sim[,i] - cluster_df[,4]) / cluster_df[,4] # simulated change
+  mod <- Mclust(sel_sim, verbose = FALSE)
+  res[i,1] <- mod$bic; res[i,2] <- which.max(mod$BIC)
 }
-# Modify mclustBICupdate to work with your list
-# Once find best model, use Mclust to append group classification
+write.csv(res, here("outputs", "cluster_simulations.csv"), row.names = FALSE)
+
+# 3c. Analyze output from 1000 simulations of likely outcomes given MOE
+mod$BIC # Sample output table to identify best model number
+res <- read.csv(here("outputs", "cluster_simulations.csv")) %>%
+  rename(BIC = V1, model_name = V2)
+res %>% count(model_name) %>% arrange(desc(n))
+# The original model selected (no. 52, VVI, 7)...is a fluke.
+# EVV, 5 is most common result when accounting for MOE.
+
+# 3d. Redo model according to results of simulation
+cluster_df <- cluster_df %>%
+  rename(baseline = li_d) %>%
+  select(baseline, change)
+mod <- Mclust(cluster_df, G = 5, modelNames = "EVV")
+summary(mod, parameters = TRUE)
+plot(mod, what = "density", type = "persp")
+
+cluster <- cluster %>%
+  mutate(group = as.factor(mod$classification)) %>%
+  select(-moe_d)
 
 # 4. Export
 st_write(trct_a_h, here("outputs", "shp_a_h.shp"))
