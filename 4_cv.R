@@ -1,5 +1,5 @@
 require(here); require(sf); require(dplyr)
-require(tidycensus); require(stringr)
+require(tidycensus); require(stringr); require(magrittr)
 options(stringsAsFactors = FALSE)
 
 # 2010 ACS data from American FactFinder
@@ -51,7 +51,7 @@ cv_d %<>%
   mutate(z_1dir = z_1dir,
          z_dif = abs(z_1dir),
          z_dif_sig = ifelse(z_dif > 1.96, "Yes", "No"),
-         z_1dir_sig = ifelse(z_1dir > 1.96, "Yes", "No")) # Indicates if stat sig increase 2012-2017
+         z_1dir_sig = ifelse(z_1dir > 1.645, "Yes", "No")) # Indicates if stat sig increase 2012-2017
 
 # Export
 st_write(cv_c, here("outputs", "cv_c.shp"))
