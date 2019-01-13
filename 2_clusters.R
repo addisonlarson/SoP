@@ -52,6 +52,7 @@ cluster_df <- left_join(trct_d, dat) %>%
 probs <- function(i){rnorm(1, mean = cluster_df[,2], sd = cluster_df[,3] / 1.645)}
 # sim = simulated; sel_sim = selected simulations; res = results
 sim <- matrix(nrow = 1364, ncol = 1000)
+sim_assign <- matrix(nrow = 1364, ncol = 1000)
 sel_sim <- matrix(nrow = 1364, ncol = 2)
 res <- matrix(nrow = ncol(sim), ncol = 2)
 for(i in 1:ncol(sim)){
@@ -59,8 +60,10 @@ for(i in 1:ncol(sim)){
   sel_sim[,1] <- sim[,i]
   sel_sim[,2] <- (sim[,i] - cluster_df[,4]) / cluster_df[,4] # simulated change
   mod <- Mclust(sel_sim, verbose = FALSE)
+  sim_assign[,i] <- mod$classification
   res[i,1] <- mod$bic; res[i,2] <- which.max(mod$BIC)
 }
+write.csv(sim_assign, here("outputs", "cluster_assignments.csv"), row.names = FALSE)
 write.csv(res, here("outputs", "cluster_simulations.csv"), row.names = FALSE)
 
 # 3c. Analyze output from 1000 simulations of likely outcomes given MOE
@@ -69,19 +72,24 @@ res <- read.csv(here("outputs", "cluster_simulations.csv")) %>%
   rename(BIC = V1, model_name = V2)
 res %>% count(model_name) %>% arrange(desc(n))
 # The original model selected (no. 52, VVI, 7)...is a fluke.
-# EVV, 5 is most common result when accounting for MOE.
+# VVV, 5 is most common result when accounting for MOE.
 
 # 3d. Redo model according to results of simulation
 cluster_df <- cluster_df %>%
   rename(baseline = li_d) %>%
   select(baseline, change)
-mod <- Mclust(cluster_df, G = 5, modelNames = "EVV")
+mod <- Mclust(cluster_df, G = 5, modelNames = "VVV")
 summary(mod, parameters = TRUE)
 plot(mod, what = "density", type = "persp")
 
 cluster <- cluster %>%
   mutate(group = as.factor(mod$classification)) %>%
   select(-moe_d)
+
+# 3e. Pretty sure this will get you same answer
+# Drop cluster_assignments columns where model != VVV,5 (122)
+res_assignments <- read.csv(here("outputs", "cluster_assignments.csv")) %>%
+  select(which(res$model_name == 122))
 
 # 4. Export
 st_write(trct_a_h, here("outputs", "shp_a_h.shp"))
