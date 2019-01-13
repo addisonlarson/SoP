@@ -54,7 +54,7 @@ We are interested in identifying census tracts with marked and noticeable change
 
 Tract typologies are created using model-based clustering along a Gaussian finite mixture distribution; see the \texttt{R} package \href{https://cran.r-project.org/web/packages/mclust/index.html}{\texttt{mclust}}. Because the 2015 data comes from the ACS and includes sample error, we run 1,000 cluster analyses with simulated baseline and change values. In each iteration, the baseline and change values vary based upon 2015 estimates and MOEs. Each census tract is assigned a new baseline value, where the mean is the census tract's estimate, the standard deviation is the tract's $\frac{MOE}{1.645}$, and the range of possible new values is normally distributed. The new baseline value is used as an input in creating a new change value.
 
-\autoref{ClusterTab} shows the results of the cluster analysis. The 5-group EVV model (ellipsoidal distribution, equal volume, varying shape and orientation) is the clear winner. This result differs from that of simply using the 2015 estimate in calculations, where the optimal model was the 7-group VVI model (diagonal distribution with varying shape and volume), though the VVI model still appears 13 times in the 1,000 iterations of cluster analysis. The results indicate that considering the MOE in computing baseline and change values affects the optimal clustering scheme in a consistent manner.
+\autoref{ClusterTab} shows the results of the cluster analysis. The 5-group VVV model (ellipsoidal distribution, varying volume, shape and orientation) is the clear winner. This result differs from that of simply using the 2015 estimate in calculations, where the optimal model was the 7-group VVI model (diagonal distribution with varying shape and volume), though the VVI model still appears 9 times in the 1,000 iterations of cluster analysis. The results indicate that considering the MOE in computing baseline and change values affects the optimal clustering scheme in a consistent manner.
 
 \begin{table}[h]
 	\caption{Cluster Analysis Results}
@@ -64,23 +64,21 @@ Tract typologies are created using model-based clustering along a Gaussian finit
 		\hline
 		Model Name & Number of Groups & \textit{n} \\ [0.5ex] 
 		\hline\hline
-		EVV & 5 & 775 \\ 
+		VVV & 5 & 790 \\ 
 		\hline
-		EVV & 6 & 104 \\
+		VVV & 6 & 103 \\
 		\hline
-		EVV & 4 & 76 \\
+		VVV & 4 & 74 \\
 		\hline
-		VVI & 5 & 13 \\
+		VVI & 5 & 12 \\
 		\hline
-		VVI & 6 & 13 \\
+		VVI & 6 & 9 \\
 		\hline
-		VVI & 7 & 13 \\
+		VVI & 7 & 9 \\
 		\hline
-		EVV & 7 & 3 \\
+		VVV & 7 & 2 \\
 		\hline
-		VVE & 6 & 2 \\
-		\hline
-		VVE & 5 & 1 \\
+		VVE & 6 & 1 \\
 		\hline \hline
 		& \textit{TOTAL} & 1000 \\ [0.5ex] 
 		\hline
