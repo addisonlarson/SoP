@@ -84,7 +84,7 @@ trct_c <- trct_d %>%
   select(GEOID) %>%
   left_join(., dat_c, by = "GEOID")
 
-# 4. Prep tabular data to use with LTDB
+# 3. Prep tabular data to use with LTDB
 orig_a <- trct_a %>%
   select(5:10) %>%
   st_set_geometry(NULL)
@@ -94,7 +94,7 @@ orig_b <- trct_b %>%
 write.csv(orig_a, here("outputs", "orig_a.csv"), row.names = FALSE)
 write.csv(orig_b, here("outputs", "orig_b.csv"), row.names = FALSE)
 
-# 2. Compute percentage low-income persons relative to county
+# 4. Compute percentage low-income persons relative to county
 cty_li <- get_acs(geography = "county",
                   state = c(34,42),
                   variables = c("S1701_C01_001E",
@@ -121,7 +121,7 @@ trct_d %<>% left_join(., cty_sd) %>%
   mutate(z = (li_d - cty_li) / cty_sd,
          z_cat = cut(z, breaks = c(-Inf, -1.5, -0.5, 0.5, 1.5, Inf)))
 
-# 3. Compute percentage low-income persons relative to region
+# 5. Compute percentage low-income persons relative to region
 reg_li <- weighted.mean(trct_d$li_d, trct_d$univ_d)
 reg_sd <- sd(trct_d$li_d, na.rm = TRUE)
 trct_d %<>%
@@ -129,7 +129,7 @@ trct_d %<>%
          z_reg = (li_d - reg_li) / reg_sd,
          z_cat_reg = cut(z_reg, breaks = c(-Inf, -1.5, -0.5, 0.5, 1.5, Inf)))
 
-# 3. Export shapefiles
+# 6. Export shapefiles
 st_write(trct_a, here("outputs", "shp_a.shp"))
 st_write(trct_b, here("outputs", "shp_b.shp"))
 st_write(trct_c, here("outputs", "shp_c.shp"))
