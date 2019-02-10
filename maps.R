@@ -4,86 +4,71 @@ options(stringsAsFactors = FALSE)
 # 2. Export plots
 
 # 1. Upload req'd files
-mcd <- st_read(here("basemap_data", "mcd.shp")) %>% # MCD boundary
+mcd <- st_read(here("map_data", "mcd.shp")) %>%
   filter(DVRPC_REG == "Yes")
+cv_c <- read_csv(here("process_data", "cv_inc_c.csv")) %>%
+  mutate_at(vars(GEOID), as.character) %>%
+  mutate_at(vars(cat_li_c), funs(fct_relevel(., "High", "Medium", "Low"))) %>%
+  select(-li_c)
+cv_d <- left_join(read_csv(here("process_data", "cv_hous_d.csv")),
+                  read_csv(here("process_data", "cv_inc_d.csv"))) %>%
+  left_join(., read_csv(here("process_data", "cv_nw_d.csv"))) %>%
+  mutate_at(vars(GEOID), as.character) %>%
+  mutate_at(vars(cat_hous_d), funs(fct_relevel(., "High", "Medium", "Low"))) %>%
+  mutate_at(vars(cat_li_d), funs(fct_relevel(., "High", "Medium", "Low"))) %>%
+  mutate_at(vars(cat_nw_d), funs(fct_relevel(., "High", "Medium", "Low"))) %>%
+  mutate_at(vars(z_1dir_sig), funs(fct_relevel(., "Yes", "No"))) %>%
+  select(-hous_d, -li_d, -nw_d)
 shp_a <- st_read(here("process_data", "a_shp.shp"))
-shp_b <- st_read(here("process_data", "a_shp.shp"))
-shp_c <- st_read(here("process_data", "a_shp.shp"))
-shp_d <- st_read(here("process_data", "a_shp.shp"))
-
-
-
-
-cv_c <- st_read(here("outputs", "./cv_c.shp")) %>% # 2012 ACS data reliability
-  mutate(cat_li = fct_relevel(cat_li, "High", "Medium", "Low"))
-cv_d <- st_read(here("outputs", "./cv_d.shp")) %>% # 2017 ACS data reliability
-  mutate(cat_li = fct_relevel(cat_li, "High", "Medium", "Low"),
-         z_dif_sig = fct_relevel(z_dif_sig, "Yes", "No"),
-         z_1dir_sig = fct_relevel(z_1dir_sig, "Yes", "No"))
-cluster <- st_read(here("outputs", "./cluster.shp")) # Baseline x change clusters
+shp_b <- st_read(here("process_data", "b_shp.shp"))
+shp_c <- st_read(here("process_data", "c_shp.shp")) %>%
+  left_join(., cv_c, by = "GEOID")
+shp_d <- st_read(here("process_data", "d_shp.shp")) %>%
+  left_join(., cv_d, by = "GEOID")
+delta <- st_read(here("process_data", "delta_shp.shp"))
+level <- st_read(here("process_data", "level_shp.shp")) %>%
+  filter(rr_li <= 40)
+cluster <- st_read(here("outputs", "cluster.shp"))
 
 # 2. Export plots
 eq_int = c(-0.0001,0.2,0.4,0.6,0.8,1.0001)
-
-# 1990 Census
+# 2.1. INCOME
 png(here("figures", "li_a.png"), width = 10, height = 7.5, units = "in", res = 500)
 plot(shp_a["li_a"], breaks = eq_int, key.pos = 1,
      pal = brewer.pal(5, "Blues"),
      border = NA, main = "Pct. Low-Income Residents, 1990", reset = FALSE)
 plot(st_geometry(mcd), col = "gray", add = TRUE)
 dev.off()
-
-# 2000 Census
 png(here("figures", "li_b.png"), width = 10, height = 7.5, units = "in", res = 500)
 plot(shp_b["li_b"], breaks = eq_int, key.pos = 1,
      pal = brewer.pal(5, "Blues"),
      border = NA, main = "Pct. Low-Income Residents, 2000", reset = FALSE)
 plot(st_geometry(mcd), col = "gray", add = TRUE)
 dev.off()
-
-# 2012 ACS
 png(here("figures", "li_c.png"), width = 10, height = 7.5, units = "in", res = 500)
 plot(shp_c["li_c"], breaks = eq_int, key.pos = 1,
      pal = brewer.pal(5, "Blues"),
      border = NA, main = "Pct. Low-Income Residents, 2010", reset = FALSE)
 plot(st_geometry(mcd), col = "gray", add = TRUE)
 dev.off()
-
-# 2012 ACS data reliability
 fill_blue <- rev(brewer.pal(4, "Blues"))[2:4]
-png(here("figures", "cv_c.png"), width = 10, height = 7.5, units = "in", res = 500)
-plot(cv_c["cat_li"], pal = fill_blue,
+png(here("figures", "cv_li_c.png"), width = 10, height = 7.5, units = "in", res = 500)
+plot(shp_c["cat_li_c"], pal = fill_blue,
      key.pos = 1, border = NA, main = "Reliability of Estimate, 2010", reset = FALSE)
 plot(st_geometry(mcd), col = "gray", add = TRUE)
 dev.off()
-
-# 2017 ACS
 png(here("figures", "li_d.png"), width = 10, height = 7.5, units = "in", res = 500)
 plot(shp_d["li_d"], breaks = eq_int, key.pos = 1,
      pal = brewer.pal(5, "Blues"),
      border = NA, main = "Pct. Low-Income Residents, 2017", reset = FALSE)
 plot(st_geometry(mcd), col = "gray", add = TRUE)
 dev.off()
-
-# 2017 ACS data reliability
 fill_blue <- rev(brewer.pal(4, "Blues"))[2:4]
-png(here("figures", "cv_d.png"), width = 10, height = 7.5, units = "in", res = 500)
-plot(cv_d["cat_li"], pal = fill_blue,
+png(here("figures", "cv_li_d.png"), width = 10, height = 7.5, units = "in", res = 500)
+plot(shp_d["cat_li_d"], pal = fill_blue,
      key.pos = 1, border = NA, main = "Reliability of Estimate, 2017", reset = FALSE)
 plot(st_geometry(mcd), col = "gray", add = TRUE)
 dev.off()
-
-# Statistically significant change ACS 2012-2017
-fill_blue <- rev(brewer.pal(4, "Blues"))[3:4]
-png(here("figures", "sig_chg_qual.png"), width = 10, height = 7.5, units = "in", res = 500)
-plot(cv_d["z_dif_sig"], pal = fill_blue,
-     key.pos = 1, border = NA,
-     main = expression(paste("Significant Change in Pct. Low-Income Residents, 2010-2017, ", alpha, " = 0.05")),
-     reset = FALSE)
-plot(st_geometry(mcd), col = "gray", add = TRUE)
-dev.off()
-
-# Statistically significant increase ACS 2012-2017
 fill_blue <- rev(brewer.pal(4, "Blues"))[3:4]
 png(here("figures", "stat_inc_qual.png"), width = 10, height = 7.5, units = "in", res = 500)
 plot(cv_d["z_1dir_sig"], pal = fill_blue,
@@ -92,49 +77,46 @@ plot(cv_d["z_1dir_sig"], pal = fill_blue,
      reset = FALSE)
 plot(st_geometry(mcd), col = "gray", add = TRUE)
 dev.off()
-
-# 2017 ACS LI relative to county, ratio
-png(here("figures", "li_rel_ratio_cty_d.png"), width = 10, height = 7.5, units = "in", res = 500)
-plot(shp_d["rel_li"], breaks = "equal", nbreaks = 5, key.pos = 1,
-     pal = brewer.pal(5, "Blues"),
-     border = NA, main = "Ratio of Low-Income Residents Relative to County Mean, 2017", reset = FALSE)
-plot(st_geometry(mcd), col = "gray", add = TRUE)
-dev.off()
-
-# 2017 ACS LI relative to county, sd
+# 2017 relative to region
 fill_blue <- brewer.pal(5, "Blues")
-png(here("figures", "li_rel_z_cty_d.png"), width = 10, height = 7.5, units = "in", res = 500)
-plot(shp_d["z_cat"], pal = fill_blue,
-     key.pos = 1, border = NA,
-     main = expression("Low-Income Residents Relative to County Mean, "*italic(z)*"-Scores, 2017"),
-     reset = FALSE)
-plot(st_geometry(mcd), col = "white", add = TRUE)
-dev.off()
-
-# 2017 ACS LI relative to region, ratio
-png(here("figures", "li_rel_ratio_reg_d.png"), width = 10, height = 7.5, units = "in", res = 500)
-plot(shp_d["rel_li_reg"], breaks = "equal", nbreaks = 5, key.pos = 1,
-     pal = brewer.pal(5, "Blues"),
+png(here("figures", "lvl_li_rr.png"), width = 10, height = 7.5, units = "in", res = 500)
+plot(level["rr_li"], breaks = "equal", nbreaks = 5, key.pos = 1,
+     pal = fill_blue,
      border = NA, main = "Ratio of Low-Income Residents Relative to Regional Mean, 2017", reset = FALSE)
 plot(st_geometry(mcd), col = "gray", add = TRUE)
 dev.off()
-
-# 2017 ACS LI relative to region, sd
-fill_blue <- brewer.pal(5, "Blues")
-png(here("figures", "li_rel_z_reg_d.png"), width = 10, height = 7.5, units = "in", res = 500)
-plot(shp_d["z_cat_reg"], pal = fill_blue,
-     key.pos = 1, border = NA,
-     main = expression("Low-Income Residents Relative to Regional Mean, "*italic(z)*"-Scores, 2017"),
-     reset = FALSE)
-plot(st_geometry(mcd), col = "white", add = TRUE)
+# 2017 relative to county
+png(here("figures", "lvl_li_rc.png"), width = 10, height = 7.5, units = "in", res = 500)
+plot(level["rc_li"], breaks = "equal", nbreaks = 5, key.pos = 1,
+     pal = fill_blue,
+     border = NA, main = "Ratio of Low-Income Residents Relative to County Mean, 2017", reset = FALSE)
+plot(st_geometry(mcd), col = "gray", add = TRUE)
+dev.off()
+# Delta relative to region
+png(here("figures", "del_li_rr.png"), width = 10, height = 7.5, units = "in", res = 500)
+plot(delta["rr_li"], breaks = "equal", nbreaks = 5, key.pos = 1,
+     pal = fill_blue,
+     border = NA, main = "Ratio of Change in Low-Income Residents Relative to Region, 1990-2017", reset = FALSE)
+plot(st_geometry(mcd), col = "gray", add = TRUE)
+dev.off()
+# Delta relative to county
+png(here("figures", "del_li_rc.png"), width = 10, height = 7.5, units = "in", res = 500)
+plot(delta["rc_li"], breaks = "equal", nbreaks = 5, key.pos = 1,
+     pal = fill_blue,
+     border = NA, main = "Ratio of Change in Low-Income Residents Relative to County, 1990-2017", reset = FALSE)
+plot(st_geometry(mcd), col = "gray", add = TRUE)
 dev.off()
 
+
+# CONTINUE SAME APPROACH FOR OTHER VARIABLES
+
+
 # Clusters
-fill_blue <- brewer.pal(7, "Blues")
+fill_blue <- brewer.pal(5, "Pastel1")
 png(here("figures", "clusters.png"), width = 10, height = 7.5, units = "in", res = 500)
 plot(cluster["group"], pal = fill_blue,
      key.pos = 1, border = NA,
-     main = "(DRAFT) Clusters by 2017 Pct. LI and 1990-2017 Pct. Chg. LI",
+     main = "Clusters by 2017 Pct. LI and 1990-2017 Pct. Chg. LI",
      reset = FALSE)
 plot(st_geometry(mcd), col = "gray", add = TRUE)
 dev.off()
