@@ -1,16 +1,19 @@
-require(here); require(sf); require(dplyr); require(magrittr)
-require(RColorBrewer); require(forcats); require(tidycensus)
+library(here); library(sf); library(tidyverse); library(RColorBrewer)
 options(stringsAsFactors = FALSE)
 # 1. Upload req'd files
 # 2. Export plots
 
 # 1. Upload req'd files
-mcd <- st_read(here("data", "./mcd.shp")) %>% # MCD boundary
+mcd <- st_read(here("basemap_data", "mcd.shp")) %>% # MCD boundary
   filter(DVRPC_REG == "Yes")
-shp_a <- st_read(here("outputs", "./shp_a.shp")) # 1990 Census data
-shp_b <- st_read(here("outputs", "./shp_b.shp")) # 2000 Census data
-shp_c <- st_read(here("outputs", "./shp_c.shp")) # 2012 ACS data (2010 midpoint)
-shp_d <- st_read(here("outputs", "./shp_d.shp")) # 2017 ACS data
+shp_a <- st_read(here("process_data", "a_shp.shp"))
+shp_b <- st_read(here("process_data", "a_shp.shp"))
+shp_c <- st_read(here("process_data", "a_shp.shp"))
+shp_d <- st_read(here("process_data", "a_shp.shp"))
+
+
+
+
 cv_c <- st_read(here("outputs", "./cv_c.shp")) %>% # 2012 ACS data reliability
   mutate(cat_li = fct_relevel(cat_li, "High", "Medium", "Low"))
 cv_d <- st_read(here("outputs", "./cv_d.shp")) %>% # 2017 ACS data reliability

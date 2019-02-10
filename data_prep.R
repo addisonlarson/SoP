@@ -99,14 +99,14 @@ inflation <- avg_cpi / as.numeric(avg_cpi["2017"])
 # NOTE: Contemporaneous tracts must be harmonized using LTDB
 hous_a <- read_csv(here("raw_data", "nhgis0010_ds120_1990_tract.csv")) %>%
   mutate(stcty = paste0(STATEA, COUNTYA),
-         hous_a = EST001 / 1000 * as.numeric(inflation["1990-12-01"])) %>%
+         hous_a = EST001 / 1000 / as.numeric(inflation["1990-12-01"])) %>%
   filter(stcty %in% area) %>%
   select(GISJOIN, hous_a)
 # 2000: NHGIS Code DS151, Specified Owner-Occupied Housing Units
 # NOTE: Contemporaneous tracts must be harmonized using LTDB
 hous_b <- read_csv(here("raw_data", "nhgis0010_ds151_2000_tract.csv")) %>%
   mutate(stcty = paste0(STATEA, COUNTYA),
-         hous_b = GB7001 / 1000 * as.numeric(inflation["2000-12-01"])) %>%
+         hous_b = GB7001 / 1000 / as.numeric(inflation["2000-12-01"])) %>%
   filter(stcty %in% area) %>%
   select(GISJOIN, hous_b)
 # 2010: ACS 5-Year B25077 2008-2012 Midpoint
@@ -118,7 +118,7 @@ hous_pa <- get_acs(geography = "tract", state = 42,
                      year = 2012)
 hous_c <- bind_rows(hous_nj, hous_pa) %>%
   mutate(stcty = str_sub(GEOID, 1, 5),
-         hous_c = estimate / 1000 * as.numeric(inflation["2010-12-01"])) %>%
+         hous_c = estimate / 1000 / as.numeric(inflation["2010-12-01"])) %>%
   filter(stcty %in% area) %>%
   select(GEOID, hous_c)
 # 2017: ACS 5-Year B25077
@@ -147,8 +147,16 @@ write_dta(orig_b, here("process_data", "orig_b.dta"))
 # Import data from LTDB
 corresp_a <- read_dta(here("process_data", "corresp_a.dta")) %>%
   zap_formats(.) %>% labelled::remove_labels(.)
+corresp_a_2 <- read_dta(here("process_data", "corresp_a_2.dta")) %>%
+  zap_formats(.) %>% labelled::remove_labels(.) %>%
+  select(-univ_a)
+corresp_a <- corresp_a %>% left_join(., corresp_a_2)
 corresp_b <- read_dta(here("process_data", "corresp_b.dta")) %>%
   zap_formats(.) %>% labelled::remove_labels(.)
+corresp_b_2 <- read_dta(here("process_data", "corresp_b_2.dta")) %>%
+  zap_formats(.) %>% labelled::remove_labels(.) %>%
+  select(-univ_b)
+corresp_b <- corresp_b %>% left_join(., corresp_b_2)
 
 # Join as tabular
 a <- inner_join(rac_a, corresp_a, by = c("GEOID" = "trtid10")) %>%

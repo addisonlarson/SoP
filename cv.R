@@ -1,58 +1,44 @@
-require(here); require(sf); require(dplyr)
-require(tidycensus); require(stringr); require(magrittr)
-options(stringsAsFactors = FALSE)
+library(here); library(tidyverse); library(tidycensus); library(sf)
+source("functions.R")
+area <- c("34005", "34007", "34015", "34021",
+          "42017", "42029", "42045", "42091", "42101")
 
-# 2010 ACS data from American FactFinder
-dat <- read.csv(here("data", "ACS_12_5YR_S1701_with_ann.csv")) %>%
-  rename(GEOID = GEO.id2) %>%
-  mutate(li = HC01_EST_VC55 / HC01_EST_VC01,
-         moe_li = moe_prop(HC01_EST_VC55, HC01_EST_VC01, HC01_MOE_VC55, HC01_MOE_VC01),
-         cv_li = (moe_li / 1.645) / li,
-         cat_li = cut(cv_li, breaks = c(-Inf, 0.12, 0.4, Inf), labels = c("High","Medium","Low"))) %>%
-  select(GEOID, ends_with("li")) %>%
-  mutate_at(vars(matches("GEOID")), as.character)
-
-# Attach geometry
-cv_c <- st_read(here("outputs", "./shp_c.shp")) %>%
-  select(GEOID) %>%
-  left_join(., dat)
-
-# 2017 ACS data from Census API
-cv_d <- get_acs(geography = "tract",
-                  state = c(34,42),
-                  variables = c("S1701_C01_001E",
-                                "S1701_C01_042E"),
-                  output = "wide",
-                  geometry = TRUE) %>%
-  mutate(xwalk = paste(substr(GEOID, 1, 2), as.numeric(substr(GEOID, 3, 5)), sep = "_")) %>%
-  filter(xwalk %in% c("34_5", "34_7", "34_15",
-                      "34_21", "42_17", "42_29",
-                      "42_45", "42_91", "42_101")) %>%
-  mutate(li = S1701_C01_042E / S1701_C01_001E,
-         moe_li = moe_prop(S1701_C01_042E, S1701_C01_001E, S1701_C01_042M, S1701_C01_001M),
-         cv_li = (moe_li / 1.645) / li,
-         cat_li = cut(cv_li, breaks = c(-Inf, 0.12, 0.4, Inf), labels = c("High","Medium","Low"))) %>%
-  select(GEOID, ends_with("li")) %>%
-  st_transform(., 26918)
-
-# Test for statistically significant differences
-cv_c %<>%
-  mutate(num_c = li,
-         denom_c = (moe_li / 1.645) ^ 2)
-cv_d %<>%
-  mutate(num_d = li,
-         denom_d = (moe_li / 1.645) ^ 2)
-z_1dir <- (cv_d$num_d - cv_c$num_c) / sqrt(cv_d$denom_d + cv_c$denom_c)
-cv_c %<>%
-  mutate(z_1dir = z_1dir,
-         z_dif = abs(z_1dir),
-         z_dif_sig = ifelse(z_dif > 1.96, "Yes", "No"))
-cv_d %<>%
-  mutate(z_1dir = z_1dir,
-         z_dif = abs(z_1dir),
-         z_dif_sig = ifelse(z_dif > 1.96, "Yes", "No"),
-         z_1dir_sig = ifelse(z_1dir > 1.645, "Yes", "No")) # Indicates if stat sig increase 2012-2017
-
+# Percentage of low-income residents
+# 2010: ACS 5-Year S1701 2008-2012 Midpoint
+d_nj <- get_acs(geography = "tract", state = 34, output = "wide",
+                variables = c("S1701_C01_001", "S1701_C01_038"),
+                year = 2012)
+d_pa <- get_acs(geography = "tract", state = 42, output = "wide",
+                variables = c("S1701_C01_001", "S1701_C01_038"),
+                year = 2012)
+cv_c <- bind_rows(d_nj, d_pa) %>%
+  mutate(stcty = str_sub(GEOID, 1, 5),
+         li_c = S1701_C01_038E / S1701_C01_001E,
+         moe_li_c = moe_prop(S1701_C01_038E, S1701_C01_001E, S1701_C01_038M, S1701_C01_001M),
+         cv_li_c = (moe_li_c / 1.645) / li_c,
+         cat_li_c = cut(cv_li_c, breaks = c(-Inf, 0.12, 0.4, Inf), labels = c("High","Medium","Low"))) %>%
+  filter(stcty %in% area) %>%
+  select(GEOID, ends_with("_c"))
+# 2017: ACS 5-Year S1701
+cv_d <- get_acs(geography = "tract", state = c(34,42), output = "wide",
+                 variables = c("S1701_C01_001", "S1701_C01_042")) %>%
+  mutate(stcty = str_sub(GEOID, 1, 5),
+         li_d = S1701_C01_042E / S1701_C01_001E,
+         moe_li_d = moe_prop(S1701_C01_042E, S1701_C01_001E, S1701_C01_042M, S1701_C01_001M),
+         cv_li_d = (moe_li_d / 1.645) / li_d,
+         cat_li_d = cut(cv_li_d, breaks = c(-Inf, 0.12, 0.4, Inf), labels = c("High","Medium","Low"))) %>%
+  filter(stcty %in% area) %>%
+  select(GEOID, ends_with("_d"))
+# Remove non-finite results
+cv_c <- cv_c[is.finite(rowSums(cv_c[,2:4])),]
+cv_d <- cv_d[is.finite(rowSums(cv_d[,2:4])),]
+# Test for statistically significant increase
+num_c <- cv_c$li_c
+denom_c <- (cv_c$moe_li_c / 1.645) ^ 2
+num_d <- cv_d$li_d
+denom_d <- (cv_d$moe_li_d / 1.645) ^ 2
+cv_d <- cv_d %>%
+  mutate(z_1dir = (num_d - num_c) / sqrt(denom_d + denom_c),
+         z_1dir_sig = ifelse(z_1dir > 1.645, "Yes", "No"))
 # Export
-st_write(cv_c, here("outputs", "cv_c.shp"))
-st_write(cv_d, here("outputs", "cv_d.shp"))
+write_csv_here(cv_c); write_csv_here(cv_d)

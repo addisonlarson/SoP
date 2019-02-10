@@ -1,20 +1,20 @@
-require(here); require(sf); require(dplyr); require(RColorBrewer)
-require(units); require(ggplot2); require(reshape2); require(magrittr)
+library(here); library(sf); library(tidyverse); library(RColorBrewer)
+library(units)
 theme_set(theme_minimal())
 # Upload required files + reclass percentage low-income
 dens <- c(-Inf, 0.1, 0.35, 0.6, Inf)
 dens_labs <- c("0-10%","11-35%","36-60%", "61-100%")
 
-shp_a <- st_read(here("outputs", "./shp_a.shp")) %>%
+shp_a <- st_read(here("process_data", "a_shp.shp")) %>%
   mutate(li_cat_a = cut(li_a, breaks = dens,
                         labels = dens_labs))
-shp_b <- st_read(here("outputs", "./shp_b.shp")) %>%
+shp_b <- st_read(here("process_data", "b_shp.shp")) %>%
   mutate(li_cat_b = cut(li_b, breaks = dens,
                         labels = dens_labs))
-shp_c <- st_read(here("outputs", "./shp_c.shp")) %>%
+shp_c <- st_read(here("process_data", "c_shp.shp")) %>%
   mutate(li_cat_c = cut(li_c, breaks = dens,
                         labels = dens_labs))
-shp_d <- st_read(here("outputs", "./shp_d.shp")) %>%
+shp_d <- st_read(here("process_data", "d_shp.shp")) %>%
   mutate(li_cat_d = cut(li_d, breaks = dens,
                         labels = dens_labs))
 
@@ -46,10 +46,10 @@ lixd_d <- tibble(pct_cat = shp_d$li_cat_d, pct = shp_d$li_d, dist = dist_d)%>%
   mutate(dist_cat = cut(dist, breaks = dens, labels = dens_labs))
 
 # Reshape data for plotting on single chart
-lixd_a %<>% mutate(yr = 1990)
-lixd_b %<>% mutate(yr = 2000)
-lixd_c %<>% mutate(yr = 2010)
-lixd_d %<>% mutate(yr = 2017)
+lixd_a <- lixd_a %>% mutate(yr = 1990)
+lixd_b <- lixd_b %>% mutate(yr = 2000)
+lixd_c <- lixd_c %>% mutate(yr = 2010)
+lixd_d <- lixd_d %>% mutate(yr = 2017)
 lixd_full <- bind_rows(lixd_a, lixd_b) %>%
   bind_rows(., lixd_c) %>%
   bind_rows(., lixd_d) %>%
