@@ -17,7 +17,8 @@ Until we come up with a better name, I'm using the uninformative abbreviation of
 - [x] Identify clusters of absolute percentage low-income residents * percentage change low-income residents
 - [x] Evaluate coefficients of variation for 2012 and 2017 ACS 5-year estimates
 - [x] Test for statistically significant changes where possible
-- [ ] Percentage of low-income residents and percentage change relative to county and relative to region
+- [x] Percentage of low-income residents and percentage change relative to county and relative to region
 - [ ] Create maps of absolute and relative percentage change with MCD labeling
 - [x] Percentage of low-income residents (*y*) by distance to Center City (*x*)
 - [ ] Incorporate objective measures of school quality, housing prices, affordable housing development, and health indicators
+- [ ] *Make sure results make sense* (outliers, etc.)
