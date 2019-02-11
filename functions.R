@@ -4,7 +4,7 @@ write_csv_here <- function(i){
 }
 write_shp_here <- function(i){
   export_name <- deparse(substitute(i))
-  st_write(i, here("process_data", paste0(export_name, ".shp")))
+  st_write(i, here("process_data", paste0(export_name, ".shp")), delete_dsn = TRUE)
 }
 sum <- function(i, ..., na.rm = TRUE) {
   base::sum(i, ..., na.rm = na.rm)

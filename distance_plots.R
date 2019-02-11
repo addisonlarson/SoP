@@ -91,6 +91,7 @@ line_blue <- brewer.pal(4, "Blues")[3]
 
 ggplot(lixd_a, aes(x = dist, y = pct)) + geom_point(color = dot_blue) +
   geom_smooth(color = line_blue) +
+  ylim(0, 1) +
   labs(title = "Tract Distance to City Hall by Percentage Low-Income Residents, 1990",
        x = "Distance to City Hall (mi.)",
        y = "Percentage Low-Income Residents")
@@ -98,6 +99,7 @@ ggsave(here("figures", "lixd_a.png"), dpi = 500)
 
 ggplot(lixd_b, aes(x = dist, y = pct)) + geom_point(color = dot_blue) +
   geom_smooth(color = line_blue) +
+  ylim(0, 1) +
   labs(title = "Tract Distance to City Hall by Percentage Low-Income Residents, 2000",
        x = "Distance to City Hall (mi.)",
        y = "Percentage Low-Income Residents")
@@ -112,6 +114,7 @@ ggsave(here("figures", "lixd_c.png"), dpi = 500)
 
 ggplot(lixd_d, aes(x = dist, y = pct)) + geom_point(color = dot_blue) +
   geom_smooth(color = line_blue) +
+  ylim(0, 1) +
   labs(title = "Tract Distance to City Hall by Percentage Low-Income Residents, 2017",
        x = "Distance to City Hall (mi.)",
        y = "Percentage Low-Income Residents")
@@ -121,6 +124,7 @@ line_blue <- c(brewer.pal(5, "Blues")[2:5], "darkolivegreen4")
 ggplot(lixd_full, aes(x = dist, y = pct, color = yr)) +
   geom_smooth(data = subset(lixd_full, yr == "Average"), show.legend = FALSE, fill = "darkolivegreen4") +
   geom_smooth(se = FALSE) +
+  ylim(0, 1) +
   scale_color_manual(values = line_blue)  +
   labs(title = "Tract Distance to City Hall by Percentage Low-Income Residents",
        x = "Distance to City Hall (mi.)",
