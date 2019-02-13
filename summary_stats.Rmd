@@ -1,0 +1,26 @@
+---
+title: "Summary Stats"
+author: "Addison Larson"
+date: "2/13/2019"
+output: pdf_document
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(echo = TRUE, results = "asis")
+```
+
+```{r hide_stuff, include = FALSE}
+library(tidyverse); library(here); library(summarytools)
+reqd_stats <- function(i) descr(i, stats = c("mean", "sd", "min", "q1", "med", "q3", "max"),
+                                style = "rmarkdown")
+dat <- list.files(here("process_data"), pattern = "*.csv") %>%
+  map(~read_csv(here("process_data", .)))
+names(dat) <- list.files(here("process_data"), pattern = "*.csv") %>%
+  str_replace(., ".csv", "")
+```
+
+```{r stuff, warning = FALSE, message = FALSE}
+res <- lapply(dat, reqd_stats)
+print(res)
+```
+
