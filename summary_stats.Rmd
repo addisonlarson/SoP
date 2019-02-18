@@ -1,7 +1,7 @@
 ---
 title: "Summary Stats"
 author: "Addison Larson"
-date: "2/13/2019"
+date: "2/18/2019"
 output: pdf_document
 ---
 
@@ -13,14 +13,40 @@ knitr::opts_chunk$set(echo = TRUE, results = "asis")
 library(tidyverse); library(here); library(summarytools)
 reqd_stats <- function(i) descr(i, stats = c("mean", "sd", "min", "q1", "med", "q3", "max"),
                                 style = "rmarkdown")
-dat <- list.files(here("process_data"), pattern = "*.csv") %>%
-  map(~read_csv(here("process_data", .)))
-names(dat) <- list.files(here("process_data"), pattern = "*.csv") %>%
-  str_replace(., ".csv", "")
+f1 <- read_csv(here("process_data", "diffs_ovr.csv"))
+f2 <- read_csv(here("process_data", "diffs_co.csv"))
+f3 <- read_csv(here("process_data", "diffs_reg.csv"))
+f4 <- read_csv(here("process_data", "ratios_ovr.csv"))
+f5 <- read_csv(here("process_data", "ratios_co.csv"))
+f6 <- read_csv(here("process_data", "ratios_reg.csv"))
 ```
 
-```{r stuff, warning = FALSE, message = FALSE}
-res <- lapply(dat, reqd_stats)
-print(res)
+# Absolute difference 1990-2017
+```{r f1, warning = FALSE, message = FALSE, echo = FALSE}
+reqd_stats(f1)
 ```
 
+# Absolute difference 1990-2017 relative to county mean
+```{r f2, warning = FALSE, message = FALSE, echo = FALSE}
+reqd_stats(f2)
+```
+
+# Absolute difference 1990-2017 relative to regional mean
+```{r f3, warning = FALSE, message = FALSE, echo = FALSE}
+reqd_stats(f3)
+```
+
+# Percentage difference 1990-2017
+```{r f4, warning = FALSE, message = FALSE, echo = FALSE}
+reqd_stats(f4)
+```
+
+# Percentage difference 1990-2017 relative to county mean
+```{r f5, warning = FALSE, message = FALSE, echo = FALSE}
+reqd_stats(f5)
+```
+
+# Percentage difference 1990-2017 relative to regional mean
+```{r f6, warning = FALSE, message = FALSE, echo = FALSE}
+reqd_stats(f6)
+```

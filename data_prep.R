@@ -58,7 +58,7 @@ d <- read_csv(here("raw_data", "nhgis0009_ts_geog2010_tract.csv")) %>%
   mutate(univ_a = select(., ends_with("1990")) %>% rowSums(., na.rm = TRUE),
          univ_b = select(., ends_with("2000")) %>% rowSums(., na.rm = TRUE),
          totnw_a = univ_a - CW7AA1990,
-         totnw_b = univ_b - CW7AA1990,
+         totnw_b = univ_b - CW7AA2000,
          nw_a = totnw_a / univ_a,
          nw_b = totnw_b / univ_b,
          stcty = paste0(STATEA, COUNTYA),
@@ -173,7 +173,9 @@ d <- inner_join(hous_d, inc_d) %>%
 # Get census tracts
 st <- str_sub(area, 1, 2)
 cty <- str_sub(area, 3, 5)
-trct <- map2(st, cty, ~{tracts(state = .x, county = .y, cb = TRUE, year = 2017)}) %>%
+trct <- map2(st, cty, ~{tracts(state = .x,
+                               county = .y,
+                               year = 2017)}) %>%
   rbind_tigris() %>%
   st_transform(., 26918) %>%
   select(GEOID, ALAND, AWATER)
