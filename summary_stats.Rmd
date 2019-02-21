@@ -1,7 +1,5 @@
 ---
 title: "Summary Stats"
-author: "Addison Larson"
-date: "2/18/2019"
 output: pdf_document
 ---
 
@@ -11,14 +9,14 @@ knitr::opts_chunk$set(echo = TRUE, results = "asis")
 
 ```{r hide_stuff, include = FALSE}
 library(tidyverse); library(here); library(summarytools)
-reqd_stats <- function(i) descr(i, stats = c("mean", "sd", "min", "q1", "med", "q3", "max"),
+reqd_stats <- function(i) descr(i, stats = c("min", "q1", "med", "mean", "sd", "q3", "max"),
                                 style = "rmarkdown")
-f1 <- read_csv(here("process_data", "diffs_ovr.csv"))
-f2 <- read_csv(here("process_data", "diffs_co.csv"))
-f3 <- read_csv(here("process_data", "diffs_reg.csv"))
-f4 <- read_csv(here("process_data", "ratios_ovr.csv"))
-f5 <- read_csv(here("process_data", "ratios_co.csv"))
-f6 <- read_csv(here("process_data", "ratios_reg.csv"))
+f1 <- read_csv(here("process_data", "diffs_ovr.csv")) %>% select(-GEOID)
+f2 <- read_csv(here("process_data", "diffs_co.csv")) %>% select(-GEOID)
+f3 <- read_csv(here("process_data", "diffs_reg.csv")) %>% select(-GEOID)
+f4 <- read_csv(here("process_data", "ratios_ovr.csv")) %>% select(-GEOID)
+f5 <- read_csv(here("process_data", "ratios_co.csv")) %>% select(-GEOID)
+f6 <- read_csv(here("process_data", "ratios_reg.csv")) %>% select(-GEOID)
 ```
 
 # Absolute difference 1990-2017
