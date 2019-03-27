@@ -1,19 +1,8 @@
-library(here); library(tidyverse); library(sf); library(tigris)
+library(here); library(tidyverse); library(sf); library(tigris); library(corrplot)
 options(stringsAsFactors = FALSE)
 theme_set(theme_minimal())
 options(tigris_use_cache = TRUE, tigris_class = "sf")
 source("functions.R")
-
-area <- c("34005", "34007", "34015", "34021",
-          "42017", "42029", "42045", "42091", "42101")
-st <- str_sub(area, 1, 2)
-cty <- str_sub(area, 3, 5)
-trct <- map2(st, cty, ~{tracts(state = .x,
-                               county = .y,
-                               year = 2017)}) %>%
-  rbind_tigris() %>%
-  st_transform(., 26918) %>%
-  select(GEOID)
 
 # Can't divide by 0 so 0 becomes 0.1
 a <- read_csv(here("process_data", "a.csv")) %>%
@@ -56,11 +45,11 @@ diffs_co <- left_join(diffs_ovr, diffs_co_mean) %>%
   select(hous, li, nw, tot199, totnw, univ)
 
 # Clean these up
-diffs_ovr <- diffs_ovr %>% select(-stcty, -GEOID)
+diffs_ovr <- diffs_ovr %>% select(-stcty)
 names(diffs_ovr) <- str_replace(names(diffs_ovr), "_a", "")
 names(diffs_reg) <- str_replace(names(diffs_reg), "_a", "")
-diffs_co <- diffs_co %>% select(-GEOID)
-diffs_reg <- diffs_reg %>% select(-GEOID)
+diffs_co$GEOID <- a$GEOID
+diffs_reg$GEOID <- a$GEOID
 
 # Relative change
 # (2017 - 1990) / 1990 (Works better for most things?)
@@ -90,11 +79,43 @@ ratios_co <- left_join(ratios_ovr, ratios_co_mean) %>%
   select(hous, li, nw, tot199, totnw, univ)
 
 # Clean these up
-ratios_ovr <- ratios_ovr %>% select(-stcty, -GEOID)
+ratios_ovr <- ratios_ovr %>% select(-stcty)
 names(ratios_ovr) <- str_replace(names(ratios_ovr), "_a", "")
 names(ratios_reg) <- str_replace(names(ratios_reg), "_a", "")
-ratios_ovr <- ratios_ovr %>% select(-GEOID)
-ratios_reg <- ratios_reg %>% select(-GEOID)
+ratios_co$GEOID <- a$GEOID
+ratios_reg$GEOID <- a$GEOID
+
+area <- c("34005", "34007", "34015", "34021",
+          "42017", "42029", "42045", "42091", "42101")
+st <- str_sub(area, 1, 2)
+cty <- str_sub(area, 3, 5)
+trct <- map2(st, cty, ~{tracts(state = .x,
+                               county = .y,
+                               year = 2017)}) %>%
+  rbind_tigris() %>%
+  st_transform(., 26918) %>%
+  select(GEOID)
+
+# `hous`: percentage change in median home value for the tract
+# `tot199`: percentage change in low-income residents
+# `univ`: percentage change in population
+ratios_ovr %>%
+  select(GEOID, hous, tot199, univ) %>%
+  mutate(cty = str_sub(GEOID, 1, 5)) %>%
+  group_by(cty) %>%
+  summarize_if(is.numeric, funs(mean(.))) %>%
+  write_csv(., here("outputs", "change_by_county.csv"))
+s <- ratios_ovr %>%
+  select(GEOID, hous, tot199, univ) %>%
+  mutate_at(vars(GEOID), as.character) %>%
+  mutate(cty = str_sub(GEOID, 1, 5)) %>%
+  left_join(trct, .)
+ratios_bycty <- split(s, s$cty)
+for(i in 1:length(ratios_bycty)){
+  cty <- names(ratios_bycty)[i]
+  shp <- as_tibble((ratios_bycty)[i])
+  st_write(shp, here("outputs", paste0("change", cty, ".shp")))
+}
 
 # Export
 rm(list = setdiff(ls(), c("diffs_ovr",
@@ -106,3 +127,26 @@ rm(list = setdiff(ls(), c("diffs_ovr",
 for (i in ls()){
   write_csv(get(i), here("process_data", paste0(i, ".csv")))
 }
+
+# Correlations
+diffs_co <- diffs_co %>%
+  select(GEOID, hous, li, nw, univ) %>%
+  drop_na(.)
+diffs_reg <- diffs_reg %>%
+  select(GEOID, hous, li, nw, univ) %>%
+  drop_na(.)
+diffs_co_cor <- cor(diffs_co[2:5])
+corrplot.mixed(diffs_co_cor)
+diffs_reg_cor <- cor(diffs_reg[2:5])
+corrplot.mixed(diffs_reg_cor)
+
+
+
+left_join(trct, diffs_co) %>%
+  st_write(., here("process_data", "abs_rel_co.shp"), delete_dsn = TRUE)
+left_join(trct, diffs_reg) %>%
+  st_write(., here("process_data", "abs_rel_reg.shp"), delete_dsn = TRUE)
+left_join(trct, ratios_co) %>%
+  st_write(., here("process_data", "ratio_rel_co.shp"), delete_dsn = TRUE)
+left_join(trct, ratios_reg) %>%
+  st_write(., here("process_data", "ratio_rel_reg.shp"), delete_dsn = TRUE)

@@ -94,6 +94,254 @@ We also test for statistically significant increases in the percentage of low-in
 \end{equation}
 See the Census Bureau's \href{https://www.census.gov/content/dam/Census/library/publications/2018/acs/acs_general_handbook_2018.pdf}{Understanding and Using American Community Survey Data}, p. 47.
 
+\subsection{Regressions}
+% Table created by stargazer v.5.2.2 by Marek Hlavac, Harvard University. E-mail: hlavac at fas.harvard.edu
+% Date and time: Wed, Mar 20, 2019 - 2:32:01 PM
+\begin{table}[!htbp] \centering 
+	\caption{Correlates of percentage change in residents with incomes below 100\% FPL, DVRPC Region} 
+	\label{} 
+	\begin{tabular}{@{\extracolsep{5pt}}lc} 
+		\\[-1.8ex]\hline 
+		\hline \\[-1.8ex] 
+		\\[-1.8ex] & Change in \% residents \\ 
+		\hline \\[-1.8ex] 
+		No. of jobs accessible by transit, 2017 & $-$0.005$^{***}$ \\ 
+		& (0.002) \\ 
+		& \\ 
+		Change in mean hours worked per week, 2010-2017 & $-$0.543$^{***}$ \\ 
+		& (0.091) \\ 
+		& \\ 
+		Change in \% renter households, 2010-2017 & 0.169$^{***}$ \\ 
+		& (0.025) \\ 
+		& \\ 
+		Change in unemployment rate, 2010-2017 & 0.360$^{***}$ \\ 
+		& (0.031) \\ 
+		& \\ 
+		Unemployment rate, 2017 & 0.041$^{**}$ \\ 
+		& (0.020) \\ 
+		& \\ 
+		Constant & $-$0.781$^{*}$ \\ 
+		& (0.460) \\ 
+		& \\ 
+		\textit{N} & 1,202 \\ 
+		R$^{2}$ & 0.220 \\ 
+		Adjusted R$^{2}$ & 0.217 \\ 
+		Residual Std. Error & 6.146 (df = 1196) \\ 
+		F Statistic & 67.651$^{***}$ (df = 5; 1196) \\ 
+		\hline 
+		\hline \\[-1.8ex] 
+		\textit{Notes:} & \multicolumn{1}{r}{$^{***}$Significant at the 1 percent level.} \\ 
+		& \multicolumn{1}{r}{$^{**}$Significant at the 5 percent level.} \\ 
+		& \multicolumn{1}{r}{$^{*}$Significant at the 10 percent level.} \\ 
+	\end{tabular} 
+\end{table}
+
+% Table created by stargazer v.5.2.2 by Marek Hlavac, Harvard University. E-mail: hlavac at fas.harvard.edu
+% Date and time: Wed, Mar 20, 2019 - 4:12:13 PM
+\begin{table}[!htbp] \centering 
+	\caption{Correlates of percentage residents with incomes below 100\% FPL, DVRPC Region} 
+		\label{} 
+		\begin{tabular}{@{\extracolsep{5pt}}lc} 
+			\\[-1.8ex]\hline 
+			\hline \\[-1.8ex] 
+			\\[-1.8ex] & \% Residents \\ 
+			\hline \\[-1.8ex] 
+			ln(\% Ethnic minority, 2017) & 1.962$^{***}$ \\ 
+			& (0.228) \\ 
+			& \\ 
+			No. of jobs accessible by transit, 2017 & 0.036$^{***}$ \\ 
+			& (0.003) \\ 
+			& \\ 
+			Mean hours worked per week, 2017 & $-$2.279$^{***}$ \\ 
+			& (0.111) \\ 
+			& \\ 
+			Change in \% owner households, 2010-2017 & 0.001 \\ 
+			& (0.002) \\ 
+			& \\ 
+			\% Renter households, 2017 & 0.279$^{***}$ \\ 
+			& (0.015) \\ 
+			& \\ 
+			Change in \% vacant housing units, 2010-2017 & $-$0.013 \\ 
+			& (0.047) \\ 
+			& \\ 
+			Constant & 86.710$^{***}$ \\ 
+			& (4.416) \\ 
+			& \\ 
+			\textit{N} & 1,183 \\ 
+			R$^{2}$ & 0.638 \\ 
+			Adjusted R$^{2}$ & 0.636 \\ 
+			Residual Std. Error & 8.296 (df = 1176) \\ 
+			F Statistic & 345.068$^{***}$ (df = 6; 1176) \\ 
+			\hline 
+			\hline \\[-1.8ex] 
+			\textit{Notes:} & \multicolumn{1}{r}{$^{***}$Significant at the 1 percent level.} \\ 
+			& \multicolumn{1}{r}{$^{**}$Significant at the 5 percent level.} \\ 
+			& \multicolumn{1}{r}{$^{*}$Significant at the 10 percent level.} \\ 
+		\end{tabular} 
+	\end{table} 
+
+\subsection{\textit{Better} Regressions}
+% Table created by stargazer v.5.2.2 by Marek Hlavac, Harvard University. E-mail: hlavac at fas.harvard.edu
+% Date and time: Wed, Mar 20, 2019 - 5:18:51 PM
+\begin{table}[!htbp] \centering 
+	\caption{Correlates of percentage change in residents with incomes below 199\% FPL, DVRPC Region} 
+		\label{} 
+		\begin{tabular}{@{\extracolsep{5pt}}lc} 
+			\\[-1.8ex]\hline 
+			\hline \\[-1.8ex] 
+			\\[-1.8ex] & Change in \% residents \\ 
+			\hline \\[-1.8ex] 
+			Change in mean hours worked per week, 2010-17 & $-$0.968$^{***}$ \\ 
+			& (0.114) \\ 
+			& \\ 
+			Change in \% racial minority residents, 2010-17 & 0.168$^{***}$ \\ 
+			& (0.029) \\ 
+			& \\ 
+			Change in \% ethnic minority residents, 2010-17 & 0.207$^{***}$ \\ 
+			& (0.045) \\ 
+			& \\ 
+			Change in \% owner households, 2010-17 & $-$0.123$^{***}$ \\ 
+			& (0.033) \\ 
+			& \\ 
+			Change in unemployment rate, 2010-17 & 0.424$^{***}$ \\ 
+			& (0.036) \\ 
+			& \\ 
+			Constant & $-$0.375 \\ 
+			& (0.263) \\ 
+			& \\ 
+			\textit{N} & 1,324 \\ 
+			R$^{2}$ & 0.201 \\ 
+			Adjusted R$^{2}$ & 0.198 \\ 
+			Residual Std. Error & 8.226 (df = 1318) \\ 
+			F Statistic & 66.417$^{***}$ (df = 5; 1318) \\ 
+			\hline 
+			\hline \\[-1.8ex] 
+			\textit{Notes:} & \multicolumn{1}{r}{$^{***}$Significant at the 1 percent level.} \\ 
+			& \multicolumn{1}{r}{$^{**}$Significant at the 5 percent level.} \\ 
+			& \multicolumn{1}{r}{$^{*}$Significant at the 10 percent level.} \\ 
+		\end{tabular} 
+	\end{table}
+
+% Table created by stargazer v.5.2.2 by Marek Hlavac, Harvard University. E-mail: hlavac at fas.harvard.edu
+% Date and time: Thu, Mar 21, 2019 - 9:22:31 AM
+\begin{table}[!htbp] \centering 
+	\caption{Correlates of percentage residents with incomes below 199\% FPL, DVRPC Region} 
+		\label{} 
+		\begin{tabular}{@{\extracolsep{5pt}}lc} 
+			\\[-1.8ex]\hline 
+			\hline \\[-1.8ex] 
+			\\[-1.8ex] & \% Residents \\ 
+			\hline \\[-1.8ex] 
+			ln(\% ethnic minority residents), 2017 & 2.978$^{***}$ \\ 
+			& (0.227) \\ 
+			& \\ 
+			\% Owner households, 2017 & $-$0.201$^{***}$ \\ 
+			& (0.014) \\ 
+			& \\ 
+			Unemployment rate, 2017 & 1.141$^{***}$ \\ 
+			& (0.030) \\ 
+			& \\ 
+			Change in unemployment rate, 2010-17 & $-$0.353$^{***}$ \\ 
+			& (0.040) \\ 
+			& \\ 
+			Number of HCV recipients in tract, 2017 & 0.100$^{***}$ \\ 
+			& (0.008) \\ 
+			& \\ 
+			Constant & 3.115$^{**}$ \\ 
+			& (1.405) \\ 
+			& \\ 
+			\textit{N} & 1,310 \\ 
+			R$^{2}$ & 0.810 \\ 
+			Adjusted R$^{2}$ & 0.809 \\ 
+			Residual Std. Error & 8.480 (df = 1304) \\ 
+			F Statistic & 1,110.318$^{***}$ (df = 5; 1304) \\ 
+			\hline 
+			\hline \\[-1.8ex] 
+			\textit{Notes:} & \multicolumn{1}{r}{$^{***}$Significant at the 1 percent level.} \\ 
+			& \multicolumn{1}{r}{$^{**}$Significant at the 5 percent level.} \\ 
+			& \multicolumn{1}{r}{$^{*}$Significant at the 10 percent level.} \\ 
+		\end{tabular} 
+	\end{table}
+
+% Table created by stargazer v.5.2.2 by Marek Hlavac, Harvard University. E-mail: hlavac at fas.harvard.edu
+% Date and time: Thu, Mar 21, 2019 - 9:41:36 AM
+\begin{table}[!htbp] \centering 
+	\caption{Correlates of percentage change in residents with incomes below 199\% FPL, DVRPC Region} 
+		\label{} 
+		\begin{tabular}{@{\extracolsep{5pt}}lc} 
+			\\[-1.8ex]\hline 
+			\hline \\[-1.8ex] 
+			\\[-1.8ex] & Change in \% residents \\ 
+			\hline \\[-1.8ex] 
+			Number of voucher holders, 2017 & 0.028$^{***}$ \\ 
+			& (0.007) \\ 
+			& \\ 
+			Mean no. of transit-accessible jobs, 2017 & $-$0.011$^{***}$ \\ 
+			& (0.003) \\ 
+			& \\ 
+			Number of LIHTC properties in tract & $-$0.654$^{***}$ \\ 
+			& (0.217) \\ 
+			& \\ 
+			Change in \% owner households, 2010-17 & $-$0.186$^{***}$ \\ 
+			& (0.035) \\ 
+			& \\ 
+			Constant & 1.270$^{***}$ \\ 
+			& (0.308) \\ 
+			& \\ 
+			\textit{N} & 1,333 \\ 
+			R$^{2}$ & 0.053 \\ 
+			Adjusted R$^{2}$ & 0.051 \\ 
+			Residual Std. Error & 8.909 (df = 1328) \\ 
+			F Statistic & 18.757$^{***}$ (df = 4; 1328) \\ 
+			\hline 
+			\hline \\[-1.8ex] 
+			\textit{Notes:} & \multicolumn{1}{r}{$^{***}$Significant at the 1 percent level.} \\ 
+			& \multicolumn{1}{r}{$^{**}$Significant at the 5 percent level.} \\ 
+			& \multicolumn{1}{r}{$^{*}$Significant at the 10 percent level.} \\ 
+		\end{tabular} 
+	\end{table} 
+
+% Table created by stargazer v.5.2.2 by Marek Hlavac, Harvard University. E-mail: hlavac at fas.harvard.edu
+% Date and time: Thu, Mar 21, 2019 - 9:54:18 AM
+\begin{table}[!htbp] \centering 
+	\caption{Correlates of percentage residents with incomes below 199\% FPL, DVRPC Region} 
+		\label{} 
+		\begin{tabular}{@{\extracolsep{5pt}}lc} 
+			\\[-1.8ex]\hline 
+			\hline \\[-1.8ex] 
+			\\[-1.8ex] & \% Residents \\ 
+			\hline \\[-1.8ex] 
+			Number of voucher holders, 2017 & 0.198$^{***}$ \\ 
+			& (0.011) \\ 
+			& \\ 
+			Mean no. of transit-accessible jobs, 2017 & 0.027$^{***}$ \\ 
+			& (0.004) \\ 
+			& \\ 
+			Mean jobs proximity index, 2014 & $-$0.077$^{***}$ \\ 
+			& (0.017) \\ 
+			& \\ 
+			Number of LIHTC properties in tract & 0.856$^{***}$ \\ 
+			& (0.316) \\ 
+			& \\ 
+			Percentage vacant housing units & 1.100$^{***}$ \\ 
+			& (0.067) \\ 
+			& \\ 
+			Constant & 11.055$^{***}$ \\ 
+			& (1.080) \\ 
+			& \\ 
+			\textit{N} & 1,333 \\ 
+			R$^{2}$ & 0.568 \\ 
+			Adjusted R$^{2}$ & 0.566 \\ 
+			Residual Std. Error & 12.803 (df = 1327) \\ 
+			F Statistic & 348.815$^{***}$ (df = 5; 1327) \\ 
+			\hline 
+			\hline \\[-1.8ex] 
+			\textit{Notes:} & \multicolumn{1}{r}{$^{***}$Significant at the 1 percent level.} \\ 
+			& \multicolumn{1}{r}{$^{**}$Significant at the 5 percent level.} \\ 
+			& \multicolumn{1}{r}{$^{*}$Significant at the 10 percent level.} \\ 
+		\end{tabular} 
+	\end{table}
+
 \section{References}
 \begin{enumerate}
 	\item Logan, J. R., Xu, Z., \& Stults, B. J. (2014). Interpolating US Decennial Census tract data from as early as 1970 to 2010: A longitudinal tract database. \textit{The Professional Geographer 66}(3), 412-420.
