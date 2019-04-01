@@ -1,4 +1,4 @@
-library(tidyverse); library(here)
+library(tidyverse); library(here); library(extrafont)
 
 merg_90 <- read_csv(here("final", "merg_90.csv")) %>%
   mutate_at(vars(geoid), as.character)
@@ -68,66 +68,77 @@ ts_cty <- bind_rows(ts_cty, ts_reg)
 # By Subregion
 ggplot(ts_4cty, aes(x = year, y = pop)) + geom_line(aes(color = Subregion)) +
   scale_color_viridis_d(option = "inferno", alpha = 0.75) +
+  theme(text = element_text(family = "Segoe UI", color = "#666666")) +
   labs(title = "Change in population 1990-2017",
        x = "Year",
        y = "Total population (1000s)")
 ggsave(here("figs", "d_pop_4cty.png"), width = 7, height = 5, units = "in", dpi = 400)
 ggplot(ts_4cty, aes(x = year, y = hu)) + geom_line(aes(color = Subregion)) +
   scale_color_viridis_d(option = "inferno", alpha = 0.75) +
+  theme(text = element_text(family = "Segoe UI", color = "#666666")) +
   labs(title = "Change in housing units 1990-2017",
        x = "Year",
        y = "Total housing units (1000s)")
 ggsave(here("figs", "d_hu_4cty.png"), width = 7, height = 5, units = "in", dpi = 400)
 ggplot(ts_4cty, aes(x = year, y = mhi)) + geom_line(aes(color = Subregion)) +
   scale_color_viridis_d(option = "inferno", alpha = 0.75) +
+  theme(text = element_text(family = "Segoe UI", color = "#666666")) +
   labs(title = "Median household income 1990-2017",
        x = "Year",
        y = "Median household income ($1000s), 2017 dollars")
 ggsave(here("figs", "d_mhi_4cty.png"), width = 7, height = 5, units = "in", dpi = 400)
 ggplot(ts_4cty, aes(x = year, y = mhv)) + geom_line(aes(color = Subregion)) +
   scale_color_viridis_d(option = "inferno", alpha = 0.75) +
+  theme(text = element_text(family = "Segoe UI", color = "#666666")) +
   labs(title = "Median home value 1990-2017",
        x = "Year",
        y = "Median home value ($1000s), 2017 dollars")
 ggsave(here("figs", "d_mhv_4cty.png"), width = 7, height = 5, units = "in", dpi = 400)
 ggplot(ts_4cty, aes(x = year, y = own)) + geom_line(aes(color = Subregion)) +
   scale_color_viridis_d(option = "inferno", alpha = 0.75) +
+  theme(text = element_text(family = "Segoe UI", color = "#666666")) +
   labs(title = "Homeownership 1990-2017",
        x = "Year",
        y = "Percentage owner-occupied housing units")
 ggsave(here("figs", "d_own_4cty.png"), width = 7, height = 5, units = "in", dpi = 400)
 ggplot(ts_4cty, aes(x = year, y = pov199)) + geom_line(aes(color = Subregion)) +
   scale_color_viridis_d(option = "inferno", alpha = 0.75) +
+  theme(text = element_text(family = "Segoe UI", color = "#666666")) +
   labs(title = "Low-income residents 1990-2017",
        x = "Year",
        y = "Percentage residents with incomes below 199% FPL")
 ggsave(here("figs", "d_pov199_4cty.png"), width = 7, height = 5, units = "in", dpi = 400)
 ggplot(ts_4cty, aes(x = year, y = pov99)) + geom_line(aes(color = Subregion)) +
   scale_color_viridis_d(option = "inferno", alpha = 0.75) +
+  theme(text = element_text(family = "Segoe UI", color = "#666666")) +
   labs(title = "Residents in poverty 1990-2017",
        x = "Year",
        y = "Percentage residents with incomes below 100% FPL")
 ggsave(here("figs", "d_pov99_4cty.png"), width = 7, height = 5, units = "in", dpi = 400)
 ggplot(ts_4cty, aes(x = year, y = rm)) + geom_line(aes(color = Subregion)) +
   scale_color_viridis_d(option = "inferno", alpha = 0.75) +
+  theme(text = element_text(family = "Segoe UI", color = "#666666")) +
   labs(title = "Racial minority residents 1990-2017",
        x = "Year",
        y = "Percentage nonwhite residents")
 ggsave(here("figs", "d_rm_4cty.png"), width = 7, height = 5, units = "in", dpi = 400)
 ggplot(ts_4cty, aes(x = year, y = em)) + geom_line(aes(color = Subregion)) +
   scale_color_viridis_d(option = "inferno", alpha = 0.75) +
+  theme(text = element_text(family = "Segoe UI", color = "#666666")) +
   labs(title = "Ethnic minority residents 1990-2017",
        x = "Year",
        y = "Percentage ethnic minority residents")
 ggsave(here("figs", "d_em_4cty.png"), width = 7, height = 5, units = "in", dpi = 400)
 ggplot(ts_4cty, aes(x = year, y = unemp)) + geom_line(aes(color = Subregion)) +
   scale_color_viridis_d(option = "inferno", alpha = 0.75) +
+  theme(text = element_text(family = "Segoe UI", color = "#666666")) +
   labs(title = "Unemployment 1990-2017",
        x = "Year",
        y = "Percentage unemployed residents in the labor force")
 ggsave(here("figs", "d_unemp_4cty.png"), width = 7, height = 5, units = "in", dpi = 400)
 ggplot(ts_4cty, aes(x = year, y = vhu)) + geom_line(aes(color = Subregion)) +
   scale_color_viridis_d(option = "inferno", alpha = 0.75) +
+  theme(text = element_text(family = "Segoe UI", color = "#666666")) +
   labs(title = "Vacant housing units 1990-2017",
        x = "Year",
        y = "Percentage vacant housing units")
@@ -136,6 +147,7 @@ ggsave(here("figs", "d_vhu_4cty.png"), width = 7, height = 5, units = "in", dpi 
 # By County
 ggplot(ts_cty %>% filter(County != "Region"), aes(x = year, y = pop)) + geom_line(aes(color = County)) +
   scale_color_viridis_d(option = "inferno", alpha = 0.75) +
+  theme(text = element_text(family = "Segoe UI", color = "#666666")) +
   # scale_color_manual(values = c("red")) +
   labs(title = "Change in population 1990-2017",
        x = "Year",
@@ -143,60 +155,70 @@ ggplot(ts_cty %>% filter(County != "Region"), aes(x = year, y = pop)) + geom_lin
 ggsave(here("figs", "d_pop.png"), width = 7, height = 5, units = "in", dpi = 400)
 ggplot(ts_cty %>% filter(County != "Region"), aes(x = year, y = hu)) + geom_line(aes(color = County)) +
   scale_color_viridis_d(option = "inferno", alpha = 0.75) +
+  theme(text = element_text(family = "Segoe UI", color = "#666666")) +
   labs(title = "Change in housing units 1990-2017",
        x = "Year",
        y = "Total housing units (1000s)")
 ggsave(here("figs", "d_hu.png"), width = 7, height = 5, units = "in", dpi = 400)
 ggplot(ts_cty, aes(x = year, y = mhi)) + geom_line(aes(color = County)) +
   scale_color_viridis_d(option = "inferno", alpha = 0.75) +
+  theme(text = element_text(family = "Segoe UI", color = "#666666")) +
   labs(title = "Median household income 1990-2017",
        x = "Year",
        y = "Median household income ($1000s), 2017 dollars")
 ggsave(here("figs", "d_mhi.png"), width = 7, height = 5, units = "in", dpi = 400)
 ggplot(ts_cty, aes(x = year, y = mhv)) + geom_line(aes(color = County)) +
   scale_color_viridis_d(option = "inferno", alpha = 0.75) +
+  theme(text = element_text(family = "Segoe UI", color = "#666666")) +
   labs(title = "Median home value 1990-2017",
        x = "Year",
        y = "Median home value ($1000s), 2017 dollars")
 ggsave(here("figs", "d_mhv.png"), width = 7, height = 5, units = "in", dpi = 400)
 ggplot(ts_cty, aes(x = year, y = own)) + geom_line(aes(color = County)) +
   scale_color_viridis_d(option = "inferno", alpha = 0.75) +
+  theme(text = element_text(family = "Segoe UI", color = "#666666")) +
   labs(title = "Homeownership 1990-2017",
        x = "Year",
        y = "Percentage owner-occupied housing units")
 ggsave(here("figs", "d_own.png"), width = 7, height = 5, units = "in", dpi = 400)
 ggplot(ts_cty, aes(x = year, y = pov199)) + geom_line(aes(color = County)) +
   scale_color_viridis_d(option = "inferno", alpha = 0.75) +
+  theme(text = element_text(family = "Segoe UI", color = "#666666")) +
   labs(title = "Low-income residents 1990-2017",
        x = "Year",
        y = "Percentage residents with incomes below 199% FPL")
 ggsave(here("figs", "d_pov199.png"), width = 7, height = 5, units = "in", dpi = 400)
 ggplot(ts_cty, aes(x = year, y = pov99)) + geom_line(aes(color = County)) +
   scale_color_viridis_d(option = "inferno", alpha = 0.75) +
+  theme(text = element_text(family = "Segoe UI", color = "#666666")) +
   labs(title = "Residents in poverty 1990-2017",
        x = "Year",
        y = "Percentage residents with incomes below 100% FPL")
 ggsave(here("figs", "d_pov99.png"), width = 7, height = 5, units = "in", dpi = 400)
 ggplot(ts_cty, aes(x = year, y = rm)) + geom_line(aes(color = County)) +
   scale_color_viridis_d(option = "inferno", alpha = 0.75) +
+  theme(text = element_text(family = "Segoe UI", color = "#666666")) +
   labs(title = "Racial minority residents 1990-2017",
        x = "Year",
        y = "Percentage nonwhite residents")
 ggsave(here("figs", "d_rm.png"), width = 7, height = 5, units = "in", dpi = 400)
 ggplot(ts_cty, aes(x = year, y = em)) + geom_line(aes(color = County)) +
   scale_color_viridis_d(option = "inferno", alpha = 0.75) +
+  theme(text = element_text(family = "Segoe UI", color = "#666666")) +
   labs(title = "Ethnic minority residents 1990-2017",
        x = "Year",
        y = "Percentage ethnic minority residents")
 ggsave(here("figs", "d_em.png"), width = 7, height = 5, units = "in", dpi = 400)
 ggplot(ts_cty, aes(x = year, y = unemp)) + geom_line(aes(color = County)) +
   scale_color_viridis_d(option = "inferno", alpha = 0.75) +
+  theme(text = element_text(family = "Segoe UI", color = "#666666")) +
   labs(title = "Unemployment 1990-2017",
        x = "Year",
        y = "Percentage unemployed residents in the labor force")
 ggsave(here("figs", "d_unemp.png"), width = 7, height = 5, units = "in", dpi = 400)
 ggplot(ts_cty, aes(x = year, y = vhu)) + geom_line(aes(color = County)) +
   scale_color_viridis_d(option = "inferno", alpha = 0.75) +
+  theme(text = element_text(family = "Segoe UI", color = "#666666")) +
   labs(title = "Vacant housing units 1990-2017",
        x = "Year",
        y = "Percentage vacant housing units")

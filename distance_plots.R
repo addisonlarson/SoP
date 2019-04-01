@@ -1,4 +1,5 @@
-library(here); library(sf); library(tidyverse); library(tigris); library(units)
+library(here); library(sf); library(tidyverse)
+library(tigris); library(units); library(extrafont)
 options(tigris_class = "sf")
 stcty <- c("34005", "34007", "34015", "34021", "42017",
            "42029", "42045", "42091", "42101")
@@ -76,39 +77,43 @@ res_17 <- inner_join(res, merg_17, by = c("GEOID" = "geoid")) %>%
 ggplot(res_90, aes(fill = li_cat, y = freq, x = dist_cat)) +
   geom_bar(position = "dodge", stat = "identity") +
   scale_y_continuous(limits = c(0,1), expand = c(0,0)) +
-  labs(title = "Tract Distance to City Hall by Percentage Low-Income Residents, 1990",
+  theme(text = element_text(family = "Segoe UI", color = "#666666")) +
+  labs(title = "Tract distance to City Hall by percentage low-income residents, 1990",
        x = "Distance to City Hall (mi.)",
-       y = "Percentage of Census Tracts by Income Group",
-       fill = "Pct. Low-Income") +
-  scale_fill_viridis_d(option = "inferno", alpha = 0.75)
+       y = "Percentage of census tracts by income group",
+       fill = "Pct. low-income") +
+  scale_fill_manual(values = c("#F5932F", "#E36A30", "#BA4649", "#962859"))
 ggsave(here("figs", "lixdr_90.png"), width = 7, height = 5, units = "in", dpi = 400)
 
 ggplot(res_00, aes(fill = li_cat, y = freq, x = dist_cat)) +
   geom_bar(position = "dodge", stat = "identity") +
   scale_y_continuous(limits = c(0,1), expand = c(0,0)) +
-  labs(title = "Tract Distance to City Hall by Percentage Low-Income Residents, 2000",
+  theme(text = element_text(family = "Segoe UI", color = "#666666")) +
+  labs(title = "Tract distance to City Hall by percentage low-income residents, 2000",
        x = "Distance to City Hall (mi.)",
-       y = "Percentage of Census Tracts by Income Group",
-       fill = "Pct. Low-Income") +
-  scale_fill_viridis_d(option = "inferno", alpha = 0.75)
+       y = "Percentage of census tracts by income group",
+       fill = "Pct. low-income") +
+  scale_fill_manual(values = c("#F5932F", "#E36A30", "#BA4649", "#962859"))
 ggsave(here("figs", "lixdr_00.png"), width = 7, height = 5, units = "in", dpi = 400)
 
 ggplot(res_10, aes(fill = li_cat, y = freq, x = dist_cat)) +
   geom_bar(position = "dodge", stat = "identity") +
   scale_y_continuous(limits = c(0,1), expand = c(0,0)) +
-  labs(title = "Tract Distance to City Hall by Percentage Low-Income Residents, 2010",
+  theme(text = element_text(family = "Segoe UI", color = "#666666")) +
+  labs(title = "Tract distance to City Hall by percentage low-income residents, 2010",
        x = "Distance to City Hall (mi.)",
-       y = "Percentage of Census Tracts by Income Group",
-       fill = "Pct. Low-Income") +
-  scale_fill_viridis_d(option = "inferno", alpha = 0.75)
+       y = "Percentage of census tracts by income group",
+       fill = "Pct. low-income") +
+  scale_fill_manual(values = c("#F5932F", "#E36A30", "#BA4649", "#962859"))
 ggsave(here("figs", "lixdr_10.png"), width = 7, height = 5, units = "in", dpi = 400)
 
 ggplot(res_17, aes(fill = li_cat, y = freq, x = dist_cat)) +
   geom_bar(position = "dodge", stat = "identity") +
   scale_y_continuous(limits = c(0,1), expand = c(0,0)) +
-  labs(title = "Tract Distance to City Hall by Percentage Low-Income Residents, 2017",
+  theme(text = element_text(family = "Segoe UI", color = "#666666")) +
+  labs(title = "Tract distance to City Hall by percentage low-income residents, 2017",
        x = "Distance to City Hall (mi.)",
-       y = "Percentage of Census Tracts by Income Group",
-       fill = "Pct. Low-Income") +
-  scale_fill_viridis_d(option = "inferno", alpha = 0.75)
+       y = "Percentage of census tracts by income group",
+       fill = "Pct. low-income") +
+  scale_fill_manual(values = c("#F5932F", "#E36A30", "#BA4649", "#962859"))
 ggsave(here("figs", "lixdr_17.png"), width = 7, height = 5, units = "in", dpi = 400)
