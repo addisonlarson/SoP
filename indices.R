@@ -1,0 +1,66 @@
+library(tidyverse); library(here)
+
+merg_90 <- read_csv(here("final", "merg_90.csv")) %>%
+  mutate_at(vars(geoid), as.character)
+merg_00 <- read_csv(here("final", "merg_00.csv")) %>%
+  mutate_at(vars(geoid), as.character)
+merg_10 <- read_csv(here("final", "merg_10.csv")) %>%
+  mutate_at(vars(geoid), as.character)
+merg_17 <- read_csv(here("final", "merg_17.csv")) %>%
+  mutate_at(vars(geoid), as.character)
+
+sum <- function(i, ..., na.rm = TRUE) {
+  base::sum(i, ..., na.rm = na.rm)
+}
+
+ts <- bind_rows(merg_90, merg_00) %>%
+  bind_rows(., merg_10) %>%
+  bind_rows(., merg_17) %>%
+  mutate_at(vars(pop), funs(. * 1000)) %>%
+  mutate(rm_cnt = rm * pop / 100,
+         nonrm_cnt = pop - rm_cnt,
+         em_cnt = em * pop / 100,
+         nonem_cnt = pop - em_cnt,
+         pov199_cnt = pov199 * pop / 100,
+         nonpov199_cnt = pop - pov199_cnt,
+         pov99_cnt = pov99 * pop / 100,
+         nonpov99_cnt = pop - pov99_cnt)
+ts_reg <- ts %>% group_by(year) %>%
+  summarize(rm_denom = sum(rm_cnt),
+            nonrm_denom = sum(nonrm_cnt),
+            em_denom = sum(em_cnt),
+            nonem_denom = sum(nonem_cnt),
+            pov199_denom = sum(pov199_cnt),
+            nonpov199_denom = sum(nonpov199_cnt),
+            pov99_denom = sum(pov99_cnt),
+            nonpov99_denom = sum(nonpov99_cnt),
+            pop_denom = sum(pop),
+            mhi_denom = mean(mhi, na.rm = TRUE))
+rm_idx <- left_join(ts, ts_reg) %>%
+  mutate(comp = abs(nonrm_cnt / nonrm_denom - rm_cnt / rm_denom)) %>%
+  group_by(year) %>%
+  summarize(idx = sum(comp) / 2)
+em_idx <- left_join(ts, ts_reg) %>%
+  mutate(comp = abs(nonem_cnt / nonem_denom - em_cnt / em_denom)) %>%
+  group_by(year) %>%
+  summarize(idx = sum(comp) / 2)
+pov199_idx <- left_join(ts, ts_reg) %>%
+  mutate(comp = abs(nonpov199_cnt / nonpov199_denom - pov199_cnt / pov199_denom)) %>%
+  group_by(year) %>%
+  summarize(idx = sum(comp) / 2)
+pov99_idx <- left_join(ts, ts_reg) %>%
+  mutate(comp = abs(nonpov99_cnt / nonpov99_denom - pov99_cnt / pov99_denom)) %>%
+  group_by(year) %>%
+  summarize(idx = sum(comp) / 2)
+mhi_idx <- left_join(ts, ts_reg) %>%
+  mutate(pop_share = pop / pop_denom,
+         mhi_share = mhi / mhi_denom,
+         lnmhi_share = log(mhi_share)) %>%
+  group_by(year) %>%
+  summarize(idx = sum(pop_share * mhi_share * lnmhi_share))
+
+rm_idx
+em_idx
+pov199_idx
+pov99_idx
+mhi_idx
