@@ -48,7 +48,7 @@ res_90 <- inner_join(res, merg_90, by = c("GEOID" = "geoid")) %>%
   tally(.) %>%
   drop_na(.) %>%
   group_by(li_cat) %>%
-  mutate(freq = n / sum(n))
+  mutate(freq = (n / sum(n)) * 100)
 res_00 <- inner_join(res, merg_00, by = c("GEOID" = "geoid")) %>%
   mutate(dist_cat = cut(dist, breaks = dens, labels = dens_labs)) %>%
   st_set_geometry(NULL) %>%
@@ -56,7 +56,7 @@ res_00 <- inner_join(res, merg_00, by = c("GEOID" = "geoid")) %>%
   tally(.) %>%
   drop_na(.) %>%
   group_by(li_cat) %>%
-  mutate(freq = n / sum(n))
+  mutate(freq = (n / sum(n)) * 100)
 res_10 <- inner_join(res, merg_10, by = c("GEOID" = "geoid")) %>%
   mutate(dist_cat = cut(dist, breaks = dens, labels = dens_labs)) %>%
   st_set_geometry(NULL) %>%
@@ -64,7 +64,7 @@ res_10 <- inner_join(res, merg_10, by = c("GEOID" = "geoid")) %>%
   tally(.) %>%
   drop_na(.) %>%
   group_by(li_cat) %>%
-  mutate(freq = n / sum(n))
+  mutate(freq = (n / sum(n)) * 100)
 res_17 <- inner_join(res, merg_17, by = c("GEOID" = "geoid")) %>%
   mutate(dist_cat = cut(dist, breaks = dens, labels = dens_labs)) %>%
   st_set_geometry(NULL) %>%
@@ -72,11 +72,11 @@ res_17 <- inner_join(res, merg_17, by = c("GEOID" = "geoid")) %>%
   tally(.) %>%
   drop_na(.) %>%
   group_by(li_cat) %>%
-  mutate(freq = n / sum(n))
+  mutate(freq = (n / sum(n)) * 100)
 
 ggplot(res_90, aes(fill = li_cat, y = freq, x = dist_cat)) +
   geom_bar(position = "dodge", stat = "identity") +
-  scale_y_continuous(limits = c(0,1), expand = c(0,0)) +
+  scale_y_continuous(limits = c(0,100), expand = c(0,0)) +
   theme(text = element_text(family = "Segoe UI", color = "#666666")) +
   labs(title = "Tract distance to City Hall by percentage low-income residents, 1990",
        x = "Distance to City Hall (mi.)",
@@ -87,7 +87,7 @@ ggsave(here("figs", "lixdr_90.png"), width = 7, height = 5, units = "in", dpi = 
 
 ggplot(res_00, aes(fill = li_cat, y = freq, x = dist_cat)) +
   geom_bar(position = "dodge", stat = "identity") +
-  scale_y_continuous(limits = c(0,1), expand = c(0,0)) +
+  scale_y_continuous(limits = c(0,100), expand = c(0,0)) +
   theme(text = element_text(family = "Segoe UI", color = "#666666")) +
   labs(title = "Tract distance to City Hall by percentage low-income residents, 2000",
        x = "Distance to City Hall (mi.)",
@@ -98,7 +98,7 @@ ggsave(here("figs", "lixdr_00.png"), width = 7, height = 5, units = "in", dpi = 
 
 ggplot(res_10, aes(fill = li_cat, y = freq, x = dist_cat)) +
   geom_bar(position = "dodge", stat = "identity") +
-  scale_y_continuous(limits = c(0,1), expand = c(0,0)) +
+  scale_y_continuous(limits = c(0,100), expand = c(0,0)) +
   theme(text = element_text(family = "Segoe UI", color = "#666666")) +
   labs(title = "Tract distance to City Hall by percentage low-income residents, 2010",
        x = "Distance to City Hall (mi.)",
@@ -109,7 +109,7 @@ ggsave(here("figs", "lixdr_10.png"), width = 7, height = 5, units = "in", dpi = 
 
 ggplot(res_17, aes(fill = li_cat, y = freq, x = dist_cat)) +
   geom_bar(position = "dodge", stat = "identity") +
-  scale_y_continuous(limits = c(0,1), expand = c(0,0)) +
+  scale_y_continuous(limits = c(0,100), expand = c(0,0)) +
   theme(text = element_text(family = "Segoe UI", color = "#666666")) +
   labs(title = "Tract distance to City Hall by percentage low-income residents, 2017",
        x = "Distance to City Hall (mi.)",
