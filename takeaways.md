@@ -6,6 +6,16 @@ Each type of information has a unique purpose. Charts provide a view of temporal
 
 When we combine these three types of information, we equip ourselves with the means to visualize broad trends, to delve into neighborhood-level changes, and to quantify changes in segregation and inequality over time.
 
+Top-line findings so far:
+
+1. Population is growing throughout the Delaware Valley region.
+2. Economic inequality is growing in the region.
+3. The region is becoming more racially and ethnically diverse and less segregated.
+4. The percentage of low-income residents is on the rise.
+5. Low-income residents live increasingly farther from Center City Philadelphia.
+6. Home values are increasing in transit-accessible suburbs and in some Philadelphia neighborhoods.
+7. Homeownership is falling rapidly in Philadelphia.
+
 ## Population is growing throughout the Delaware Valley region.
 
 Montgomery and Chester counties in Philadelphia have seen faster rates of growth than the rest of the region. Though Philadelphia's population decreased from 1990 to 2000, it is on the rise again.
@@ -60,11 +70,11 @@ The dissimilarity index is a measure of the spatial evenness of a population and
 
 The percentage of low-income residents has increased in the region as a whole. The rate of increase appears slower in Gloucester and Delaware Counties than the rest of the region.
 
-<img src="https://github.com/addisonlarson/SoP/raw/master/figs/d_li.png" width="560" height="400">
+<img src="https://github.com/addisonlarson/SoP/raw/master/figs/d_pov199.png" width="560" height="400">
 
 In Philadelphia, the percentage of low-income residents has increased substantially in most northern and northeastern neighborhoods. In the suburban Pennsylvania counties, Folcroft, Eddystone, Trainer, Millbourne, and parts of Collingdale and Colwyn Boroughs, as well as Yeadon and Darby and parts of Chester City in Delaware County; parts of Phoenixville and Coatesville Boroughs in Chester County; West Pottsgrove, West Norriton, Cheltenham, and Abington Townships and Pottstown, Royersford, and Norristown Boroughs in Montgomery County; and Bristol, Bensalem, and Bridgeton Townships in Bucks County have seen increases in the percentage of low-income residents. In New Jersey, these areas include Lindenwold and Bellmawr boroughs, Morgan Village and Bergen Square neighborhoods in Camden, and the northern part of Pennsauken Township in Camden County; Ewing and Hamilton Townships in Mercer County; and Edgewater Park, Willingboro, and Riverside Townships and Beverly and Palmyra Boroughs in Burlington County.
 
-![alt text](https://github.com/addisonlarson/SoP/raw/master/figs/d_li_map.png "Change in percentage low-income residents 1990-2017")
+![alt text](https://github.com/addisonlarson/SoP/raw/master/figs/d_pov199_map.png "Change in percentage low-income residents 1990-2017")
 
 ## Low-income residents live increasingly farther from Center City Philadelphia.
 
