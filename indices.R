@@ -24,7 +24,9 @@ ts <- bind_rows(merg_90, merg_00) %>%
          pov199_cnt = pov199 * pop / 100,
          nonpov199_cnt = pop - pov199_cnt,
          pov99_cnt = pov99 * pop / 100,
-         nonpov99_cnt = pop - pov99_cnt)
+         nonpov99_cnt = pop - pov99_cnt,
+         unemp_cnt = unemp * pop / 100,
+         nonunemp_cnt = pop - unemp_cnt)
 ts_reg <- ts %>% group_by(year) %>%
   summarize(rm_denom = sum(rm_cnt),
             nonrm_denom = sum(nonrm_cnt),
@@ -34,6 +36,8 @@ ts_reg <- ts %>% group_by(year) %>%
             nonpov199_denom = sum(nonpov199_cnt),
             pov99_denom = sum(pov99_cnt),
             nonpov99_denom = sum(nonpov99_cnt),
+            unemp_denom = sum(unemp_cnt),
+            nonunemp_denom = sum(nonunemp_cnt),
             pop_denom = sum(pop),
             mhi_denom = mean(mhi, na.rm = TRUE))
 rm_idx <- left_join(ts, ts_reg) %>%
@@ -52,6 +56,10 @@ pov99_idx <- left_join(ts, ts_reg) %>%
   mutate(comp = abs(nonpov99_cnt / nonpov99_denom - pov99_cnt / pov99_denom)) %>%
   group_by(year) %>%
   summarize(idx = sum(comp) / 2)
+unemp_idx <- left_join(ts, ts_reg) %>%
+  mutate(comp = abs(nonunemp_cnt / nonunemp_denom - unemp_cnt / unemp_denom)) %>%
+  group_by(year) %>%
+  summarize(idx = sum(comp) / 2)
 mhi_idx <- left_join(ts, ts_reg) %>%
   mutate(pop_share = pop / pop_denom,
          mhi_share = mhi / mhi_denom,
@@ -63,4 +71,5 @@ rm_idx
 em_idx
 pov199_idx
 pov99_idx
+unemp_idx
 mhi_idx
