@@ -39,3 +39,5 @@ rsconnect/
 /readings
 /archive
 /dev
+
+*.mxd

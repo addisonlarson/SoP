@@ -6,7 +6,7 @@ slicer <- c("42045980000", "42017980000", "42101980800",
             "42101005000", "34021002400")
 
 # Block-Standardized Data
-bl <- read_csv(here("dev", "raw", "nhgis0011_ts_geog2010_tract.csv")) %>%
+bl <- read_csv(here("raw", "nhgis0011_ts_geog2010_tract.csv")) %>%
   mutate(geoid = paste0(str_sub(GISJOIN, 2, 3), str_sub(GISJOIN, 5, 7), str_sub(GISJOIN, 9, 14)),
          stcty = paste0(str_sub(GISJOIN, 2, 3), str_sub(GISJOIN, 5, 7))) %>%
   filter(stcty %in% c("34005", "34007", "34015", "34021", "42017", "42029", "42045", "42091", "42101")) %>%
@@ -64,22 +64,22 @@ write_csv(bl_00, here("interim", "bl_std_00.csv"))
 write_csv(bl_10, here("interim", "bl_std_10.csv"))
 # Input Data for LTDB
 raw_90a <- read_csv(here("raw", "nhgis0011_ds120_1990_tract.csv"))
-gr <- str_sub(raw_90a$GISJOIN, 2, 3)
-o <- str_sub(raw_90a$GISJOIN, 5, 7)
-ss <- str_sub(raw_90a$GISJOIN, 9, -1) %>%
+a <- str_sub(raw_90a$GISJOIN, 2, 3)
+b <- str_sub(raw_90a$GISJOIN, 5, 7)
+c <- str_sub(raw_90a$GISJOIN, 9, -1) %>%
   str_pad(., 6, side = "right", pad = "0")
-gross <- paste0(gr, o, ss)
+abc <- paste0(a, b, c)
 raw_90a <- raw_90a %>%
   rename(mhv = EST001) %>%
   mutate(year = 1990,
-         geoid = gross) %>%
+         geoid = abc) %>%
   select(geoid, year, mhv)
 raw_90b <- read_csv(here("raw", "nhgis0011_ds123_1990_tract.csv"))
-gr <- str_sub(raw_90b$GISJOIN, 2, 3)
-o <- str_sub(raw_90b$GISJOIN, 5, 7)
-ss <- str_sub(raw_90b$GISJOIN, 9, -1) %>%
+a <- str_sub(raw_90b$GISJOIN, 2, 3)
+b <- str_sub(raw_90b$GISJOIN, 5, 7)
+c <- str_sub(raw_90b$GISJOIN, 9, -1) %>%
   str_pad(., 6, side = "right", pad = "0")
-gross <- paste0(gr, o, ss)
+abc <- paste0(a, b, c)
 raw_90b <- raw_90b %>%
   mutate(unemp_u = E4I002 + E4I003 + E4I006 + E4I007,
          unemp = (E4I003 + E4I007) / unemp_u * 100,
@@ -88,17 +88,17 @@ raw_90b <- raw_90b %>%
            E1C006 + E1C007 + E1C008 + E1C009,
          pov199 = (pov_u - E1C009) / pov_u * 100,
          pov99 = (E1C001 + E1C002 + E1C003) / pov_u * 100,
-         geoid = gross) %>%
+         geoid = abc) %>%
   select(geoid, unemp, mhi, pov199, pov99)
 raw_90c <- read_csv(here("raw", "nhgis0012_ds120_1990_tract.csv"))
-gr <- str_sub(raw_90c$GISJOIN, 2, 3)
-o <- str_sub(raw_90c$GISJOIN, 5, 7)
-ss <- str_sub(raw_90c$GISJOIN, 9, -1) %>%
+a <- str_sub(raw_90c$GISJOIN, 2, 3)
+b <- str_sub(raw_90c$GISJOIN, 5, 7)
+c <- str_sub(raw_90c$GISJOIN, 9, -1) %>%
   str_pad(., 6, side = "right", pad = "0")
-gross <- paste0(gr, o, ss)
+abc <- paste0(a, b, c)
 raw_90c <- raw_90c %>%
   mutate(pop = ET1001,
-         geoid = gross) %>%
+         geoid = abc) %>%
   select(geoid, pop)
 raw_00a <- read_csv(here("raw", "nhgis0011_ds151_2000_tract.csv")) %>%
   mutate(unemp_u = GLR001 + GLR002 + GLR003 + GLR004,
@@ -179,23 +179,23 @@ merg_90 <- left_join(bl_90, ltdb_90_res)
 merg_00 <- left_join(bl_00, ltdb_00_res)
 
 acs_10_nj <- get_acs(geography = "tract",
-                  year = 2010,
-                  variables = c("B25077_001",
-                                "B05010_001",
-                                "B05010_002", # 0-99%
-                                "B05010_010", # 100-199%
-                                "B05010_018", # 200+ %
-                                "B19013_001",
-                                "B17005_004", # Males blpov in labor force
-                                "B17005_009", # Males abpov in labor force
-                                "B17005_015", # Females blpov in labor force
-                                "B17005_020", # Females abpov in labor force
-                                "B17005_006", # Males blpov in labor force unemp
-                                "B17005_011", # Males abpov in labor force unemp
-                                "B17005_017", # Females blpov in labor force
-                                "B17005_022"), # Females abpov in labor force
-                  state = 34,
-                  output = "wide") %>%
+                     year = 2010,
+                     variables = c("B25077_001",
+                                   "B05010_001",
+                                   "B05010_002", # 0-99%
+                                   "B05010_010", # 100-199%
+                                   "B05010_018", # 200+ %
+                                   "B19013_001",
+                                   "B17005_004", # Males blpov in labor force
+                                   "B17005_009", # Males abpov in labor force
+                                   "B17005_015", # Females blpov in labor force
+                                   "B17005_020", # Females abpov in labor force
+                                   "B17005_006", # Males blpov in labor force unemp
+                                   "B17005_011", # Males abpov in labor force unemp
+                                   "B17005_017", # Females blpov in labor force
+                                   "B17005_022"), # Females abpov in labor force
+                     state = 34,
+                     output = "wide") %>%
   filter(str_sub(GEOID, 1, 5) %in% c("34005", "34007", "34015", "34021", "42017",
                                      "42029", "42045", "42091", "42101")) %>%
   mutate(pov199 = (B05010_001E - B05010_018E) / B05010_001E * 100,
@@ -206,23 +206,23 @@ acs_10_nj <- get_acs(geography = "tract",
            (B17005_004E + B17005_009E + B17005_015E + B17005_020E) * 100) %>%
   select(GEOID, pov199, pov99, mhv, mhi, unemp)
 acs_10_pa <- get_acs(geography = "tract",
-                  year = 2010,
-                  variables = c("B25077_001",
-                                "B05010_001",
-                                "B05010_002", # 0-99%
-                                "B05010_010", # 100-199%
-                                "B05010_018", # 200+ %
-                                "B19013_001",
-                                "B17005_004", # Males blpov in labor force
-                                "B17005_009", # Males abpov in labor force
-                                "B17005_015", # Females blpov in labor force
-                                "B17005_020", # Females abpov in labor force
-                                "B17005_006", # Males blpov in labor force unemp
-                                "B17005_011", # Males abpov in labor force unemp
-                                "B17005_017", # Females blpov in labor force
-                                "B17005_022"), # Females abpov in labor force
-                  state = 42,
-                  output = "wide") %>%
+                     year = 2010,
+                     variables = c("B25077_001",
+                                   "B05010_001",
+                                   "B05010_002", # 0-99%
+                                   "B05010_010", # 100-199%
+                                   "B05010_018", # 200+ %
+                                   "B19013_001",
+                                   "B17005_004", # Males blpov in labor force
+                                   "B17005_009", # Males abpov in labor force
+                                   "B17005_015", # Females blpov in labor force
+                                   "B17005_020", # Females abpov in labor force
+                                   "B17005_006", # Males blpov in labor force unemp
+                                   "B17005_011", # Males abpov in labor force unemp
+                                   "B17005_017", # Females blpov in labor force
+                                   "B17005_022"), # Females abpov in labor force
+                     state = 42,
+                     output = "wide") %>%
   filter(str_sub(GEOID, 1, 5) %in% c("34005", "34007", "34015", "34021", "42017",
                                      "42029", "42045", "42091", "42101")) %>%
   mutate(pov199 = (B05010_001E - B05010_018E) / B05010_001E * 100,

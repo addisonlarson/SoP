@@ -43,33 +43,34 @@ ts_reg <- ts %>% group_by(year) %>%
 rm_idx <- left_join(ts, ts_reg) %>%
   mutate(comp = abs(nonrm_cnt / nonrm_denom - rm_cnt / rm_denom)) %>%
   group_by(year) %>%
-  summarize(idx = sum(comp) / 2)
+  summarize(idx = round((sum(comp) / 2), 3))
 em_idx <- left_join(ts, ts_reg) %>%
   mutate(comp = abs(nonem_cnt / nonem_denom - em_cnt / em_denom)) %>%
   group_by(year) %>%
-  summarize(idx = sum(comp) / 2)
+  summarize(idx = round((sum(comp) / 2), 3))
 pov199_idx <- left_join(ts, ts_reg) %>%
   mutate(comp = abs(nonpov199_cnt / nonpov199_denom - pov199_cnt / pov199_denom)) %>%
   group_by(year) %>%
-  summarize(idx = sum(comp) / 2)
+  summarize(idx = round((sum(comp) / 2), 3))
 pov99_idx <- left_join(ts, ts_reg) %>%
   mutate(comp = abs(nonpov99_cnt / nonpov99_denom - pov99_cnt / pov99_denom)) %>%
   group_by(year) %>%
-  summarize(idx = sum(comp) / 2)
+  summarize(idx = round((sum(comp) / 2), 3))
 unemp_idx <- left_join(ts, ts_reg) %>%
   mutate(comp = abs(nonunemp_cnt / nonunemp_denom - unemp_cnt / unemp_denom)) %>%
   group_by(year) %>%
-  summarize(idx = sum(comp) / 2)
+  summarize(idx = round((sum(comp) / 2), 3))
 mhi_idx <- left_join(ts, ts_reg) %>%
   mutate(pop_share = pop / pop_denom,
          mhi_share = mhi / mhi_denom,
          lnmhi_share = log(mhi_share)) %>%
   group_by(year) %>%
-  summarize(idx = sum(pop_share * mhi_share * lnmhi_share))
+  summarize(idx = round((sum(pop_share * mhi_share * lnmhi_share)), 3))
 
-rm_idx
-em_idx
-pov199_idx
-pov99_idx
-unemp_idx
-mhi_idx
+# Export
+write_csv(rm_idx, here("final", "racial_dissim_idx.csv"))
+write_csv(em_idx, here("final", "ethnic_dissim_idx.csv"))
+write_csv(pov199_idx, here("final", "low_income_dissim_idx.csv"))
+write_csv(pov99_idx, here("final", "poverty_dissim_idx.csv"))
+write_csv(unemp_idx, here("final", "unemployment_dissim_idx.csv"))
+write_csv(mhi_idx, here("final", "income_theil_idx.csv"))

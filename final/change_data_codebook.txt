@@ -1,0 +1,14 @@
+"_d" stands for "delta."
+
+GEOID		2010 Census Tract GEOID
+pop_d		Change in tract population 1990-2017, 1000s
+hu_d		Change in number of housing units in tract 1990-2017, 1000s
+own_d		Change in % housing units owned (as opposed to rented) in tract 1990-2017, can range from 0 to 100
+vhu_d		Change in % Vacant housing units in tract 1990-2017, can range from 0 to 100
+rm_d		Change in % racial minority residents in tract 1990-2017, can range from 0 to 100
+em_d		Change in % ethnic minority residents in tract 1990-2017, can range from 0 to 100
+unemp_d		Change in % unemployed civilian persons 16 years and over in the labor force 1990-2017, can range from 0 to 100
+mhi_d		Change in tract median household income 1990-2017, $1000s, 2017 dollars
+pov199_d	Change in % residents with incomes 0-199% of the Federal Poverty Level 1990-2017, can range from 0 to 100
+pov99_d		Change in % residents with incomes 0-99% of the Federal Poverty Level 1990-2017, can range from 0 to 100
+mhv_d		Change in median home value 1990-2017, $1000s, 2017 dollars

@@ -32,6 +32,7 @@ for (i in 1:length(stcty)){
 }
 
 change <- inner_join(res, change, by = c("GEOID" = "geoid")) %>%
-  st_transform(., 26918)
+  st_transform(., 26918) %>%
+  mutate_if(is.numeric, round, 3)
 
 st_write(change, here("final", "change.shp"), delete_dsn = TRUE)

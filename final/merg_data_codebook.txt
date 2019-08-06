@@ -1,0 +1,13 @@
+geoid		2010 Census Tract GEOID
+year		Data year
+pop		Tract population, 1000s
+hu		Number of housing units in tract, 1000s
+own		% Housing units owned (as opposed to rented) in tract, can range from 0 to 100
+vhu		% Vacant housing units in tract, can range from 0 to 100
+rm		% Racial minority residents in tract, can range from 0 to 100
+em		% Ethnic minority residents in tract, can range from 0 to 100
+unemp		% Unemployed civilian persons 16 years and over in the labor force, can range from 0 to 100
+mhi		Tract median household income, $1000s, 2017 dollars
+pov199		% Residents with incomes 0-199% of the Federal Poverty Level, can range from 0 to 100
+pov99		% Residents with incomes 0-99% of the Federal Poverty Level, can range from 0 to 100
+mhv		Median home value, $1000s, 2017 dollars
