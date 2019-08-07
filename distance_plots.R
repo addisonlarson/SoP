@@ -82,7 +82,7 @@ ggplot(res_90, aes(fill = li_cat, y = freq, x = dist_cat)) +
        x = "Distance to City Hall (mi.)",
        y = "Percentage of census tracts by income group",
        fill = "Pct. low-income") +
-  scale_fill_manual(values = c("#FCA50A", "#DD513A", "#932667", "#420A68"))
+  scale_fill_manual(values = c("#F57D15", "#D44842", "#9F2A63", "#65156E"))
 ggsave(here("figs", "lixdr_90.png"), width = 7, height = 5, units = "in", dpi = 400)
 
 ggplot(res_00, aes(fill = li_cat, y = freq, x = dist_cat)) +
@@ -93,7 +93,7 @@ ggplot(res_00, aes(fill = li_cat, y = freq, x = dist_cat)) +
        x = "Distance to City Hall (mi.)",
        y = "Percentage of census tracts by income group",
        fill = "Pct. low-income") +
-  scale_fill_manual(values = c("#FCA50A", "#DD513A", "#932667", "#420A68"))
+  scale_fill_manual(values = c("#F57D15", "#D44842", "#9F2A63", "#65156E"))
 ggsave(here("figs", "lixdr_00.png"), width = 7, height = 5, units = "in", dpi = 400)
 
 ggplot(res_10, aes(fill = li_cat, y = freq, x = dist_cat)) +
@@ -104,7 +104,7 @@ ggplot(res_10, aes(fill = li_cat, y = freq, x = dist_cat)) +
        x = "Distance to City Hall (mi.)",
        y = "Percentage of census tracts by income group",
        fill = "Pct. low-income") +
-  scale_fill_manual(values = c("#FCA50A", "#DD513A", "#932667", "#420A68"))
+  scale_fill_manual(values = c("#F57D15", "#D44842", "#9F2A63", "#65156E"))
 ggsave(here("figs", "lixdr_10.png"), width = 7, height = 5, units = "in", dpi = 400)
 
 ggplot(res_17, aes(fill = li_cat, y = freq, x = dist_cat)) +
@@ -115,5 +115,5 @@ ggplot(res_17, aes(fill = li_cat, y = freq, x = dist_cat)) +
        x = "Distance to City Hall (mi.)",
        y = "Percentage of census tracts by income group",
        fill = "Pct. low-income") +
-  scale_fill_manual(values = c("#FCA50A", "#DD513A", "#932667", "#420A68"))
+  scale_fill_manual(values = c("#F57D15", "#D44842", "#9F2A63", "#65156E"))
 ggsave(here("figs", "lixdr_17.png"), width = 7, height = 5, units = "in", dpi = 400)

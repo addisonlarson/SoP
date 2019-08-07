@@ -1,0 +1,9 @@
+A guide to the contents of this folder
+
+`archive`:		Old scripts and data.
+`documentation`:	Analysis plan, technical reference, draft write-up, fonts and colors.
+`figs`:			Exported figures.
+`final`:		Exported datasets.
+`interim`:		.dta files used with Longitudinal Tract Database.
+`maps`:			Exported maps and associated .mxd.
+`raw`:			Raw datasets.

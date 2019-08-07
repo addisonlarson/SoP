@@ -65,37 +65,41 @@ ts_reg <- ts %>%
             County = "Region")
 ts_cty <- bind_rows(ts_cty, ts_reg)
 
+# Export
+write_csv(ts_agg, here("final", "ts_subregion.csv"))
+write_csv(ts_cty, here("final", "ts_cty.csv"))
+
 # By Subregion
 ggplot(ts_agg, aes(x = year, y = pop)) + geom_line(aes(color = Subregion)) +
-  scale_color_manual(values = c("#FCA50A", "#DD513A", "#932667")) +
+  scale_color_manual(values = c("#F57D15", "#D44842", "#9F2A63")) +
   theme(text = element_text(family = "Segoe UI", color = "#666666")) +
   labs(title = "Change in population 1990-2017",
        x = "Year",
        y = "Total population (1000s)")
 ggsave(here("figs", "d_pop_agg.png"), width = 7, height = 5, units = "in", dpi = 400)
 ggplot(ts_agg, aes(x = year, y = hu)) + geom_line(aes(color = Subregion)) +
-  scale_color_manual(values = c("#FCA50A", "#DD513A", "#932667")) +
+  scale_color_manual(values = c("#F57D15", "#D44842", "#9F2A63")) +
   theme(text = element_text(family = "Segoe UI", color = "#666666")) +
   labs(title = "Change in housing units 1990-2017",
        x = "Year",
        y = "Total housing units (1000s)")
 ggsave(here("figs", "d_hu_agg.png"), width = 7, height = 5, units = "in", dpi = 400)
 ggplot(ts_agg, aes(x = year, y = mhi)) + geom_line(aes(color = Subregion)) +
-  scale_color_manual(values = c("#FCA50A", "#DD513A", "#932667")) +
+  scale_color_manual(values = c("#F57D15", "#D44842", "#9F2A63")) +
   theme(text = element_text(family = "Segoe UI", color = "#666666")) +
   labs(title = "Median household income 1990-2017",
        x = "Year",
        y = "Median household income ($1000s), 2017 dollars")
 ggsave(here("figs", "d_mhi_agg.png"), width = 7, height = 5, units = "in", dpi = 400)
 ggplot(ts_agg, aes(x = year, y = mhv)) + geom_line(aes(color = Subregion)) +
-  scale_color_manual(values = c("#FCA50A", "#DD513A", "#932667")) +
+  scale_color_manual(values = c("#F57D15", "#D44842", "#9F2A63")) +
   theme(text = element_text(family = "Segoe UI", color = "#666666")) +
   labs(title = "Median home value 1990-2017",
        x = "Year",
        y = "Median home value ($1000s), 2017 dollars")
 ggsave(here("figs", "d_mhv_agg.png"), width = 7, height = 5, units = "in", dpi = 400)
 ggplot(ts_agg, aes(x = year, y = own)) + geom_line(aes(color = Subregion)) +
-  scale_color_manual(values = c("#FCA50A", "#DD513A", "#932667")) +
+  scale_color_manual(values = c("#F57D15", "#D44842", "#9F2A63")) +
   scale_y_continuous(limits = c(0,100), expand = c(0,0)) +
   theme(text = element_text(family = "Segoe UI", color = "#666666")) +
   labs(title = "Homeownership 1990-2017",
@@ -103,7 +107,7 @@ ggplot(ts_agg, aes(x = year, y = own)) + geom_line(aes(color = Subregion)) +
        y = "Percentage owner-occupied housing units")
 ggsave(here("figs", "d_own_agg.png"), width = 7, height = 5, units = "in", dpi = 400)
 ggplot(ts_agg, aes(x = year, y = pov199)) + geom_line(aes(color = Subregion)) +
-  scale_color_manual(values = c("#FCA50A", "#DD513A", "#932667")) +
+  scale_color_manual(values = c("#F57D15", "#D44842", "#9F2A63")) +
   scale_y_continuous(limits = c(0,100), expand = c(0,0)) +
   theme(text = element_text(family = "Segoe UI", color = "#666666")) +
   labs(title = "Low-income residents 1990-2017",
@@ -111,7 +115,7 @@ ggplot(ts_agg, aes(x = year, y = pov199)) + geom_line(aes(color = Subregion)) +
        y = "Percentage residents with incomes below 199% FPL")
 ggsave(here("figs", "d_pov199_agg.png"), width = 7, height = 5, units = "in", dpi = 400)
 ggplot(ts_agg, aes(x = year, y = pov99)) + geom_line(aes(color = Subregion)) +
-  scale_color_manual(values = c("#FCA50A", "#DD513A", "#932667")) +
+  scale_color_manual(values = c("#F57D15", "#D44842", "#9F2A63")) +
   scale_y_continuous(limits = c(0,100), expand = c(0,0)) +
   theme(text = element_text(family = "Segoe UI", color = "#666666")) +
   labs(title = "Residents in poverty 1990-2017",
@@ -119,7 +123,7 @@ ggplot(ts_agg, aes(x = year, y = pov99)) + geom_line(aes(color = Subregion)) +
        y = "Percentage residents with incomes below 100% FPL")
 ggsave(here("figs", "d_pov99_agg.png"), width = 7, height = 5, units = "in", dpi = 400)
 ggplot(ts_agg, aes(x = year, y = rm)) + geom_line(aes(color = Subregion)) +
-  scale_color_manual(values = c("#FCA50A", "#DD513A", "#932667")) +
+  scale_color_manual(values = c("#F57D15", "#D44842", "#9F2A63")) +
   scale_y_continuous(limits = c(0,100), expand = c(0,0)) +
   theme(text = element_text(family = "Segoe UI", color = "#666666")) +
   labs(title = "Racial minority residents 1990-2017",
@@ -127,7 +131,7 @@ ggplot(ts_agg, aes(x = year, y = rm)) + geom_line(aes(color = Subregion)) +
        y = "Percentage racial minority residents")
 ggsave(here("figs", "d_rm_agg.png"), width = 7, height = 5, units = "in", dpi = 400)
 ggplot(ts_agg, aes(x = year, y = em)) + geom_line(aes(color = Subregion)) +
-  scale_color_manual(values = c("#FCA50A", "#DD513A", "#932667")) +
+  scale_color_manual(values = c("#F57D15", "#D44842", "#9F2A63")) +
   scale_y_continuous(limits = c(0,100), expand = c(0,0)) +
   theme(text = element_text(family = "Segoe UI", color = "#666666")) +
   labs(title = "Ethnic minority residents 1990-2017",
@@ -135,7 +139,7 @@ ggplot(ts_agg, aes(x = year, y = em)) + geom_line(aes(color = Subregion)) +
        y = "Percentage ethnic minority residents")
 ggsave(here("figs", "d_em_agg.png"), width = 7, height = 5, units = "in", dpi = 400)
 ggplot(ts_agg, aes(x = year, y = unemp)) + geom_line(aes(color = Subregion)) +
-  scale_color_manual(values = c("#FCA50A", "#DD513A", "#932667")) +
+  scale_color_manual(values = c("#F57D15", "#D44842", "#9F2A63")) +
   scale_y_continuous(limits = c(0,100), expand = c(0,0)) +
   theme(text = element_text(family = "Segoe UI", color = "#666666")) +
   labs(title = "Unemployment 1990-2017",
@@ -143,7 +147,7 @@ ggplot(ts_agg, aes(x = year, y = unemp)) + geom_line(aes(color = Subregion)) +
        y = "Percentage unemployed residents in the labor force")
 ggsave(here("figs", "d_unemp_agg.png"), width = 7, height = 5, units = "in", dpi = 400)
 ggplot(ts_agg, aes(x = year, y = vhu)) + geom_line(aes(color = Subregion)) +
-  scale_color_manual(values = c("#FCA50A", "#DD513A", "#932667")) +
+  scale_color_manual(values = c("#F57D15", "#D44842", "#9F2A63")) +
   scale_y_continuous(limits = c(0,100), expand = c(0,0)) +
   theme(text = element_text(family = "Segoe UI", color = "#666666")) +
   labs(title = "Vacant housing units 1990-2017",
