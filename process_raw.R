@@ -236,6 +236,7 @@ acs_10 <- bind_rows(acs_10_pa, acs_10_nj)
 merg_10 <- left_join(bl_10, acs_10, by = c("geoid" = "GEOID"))
 
 acs_17 <- get_acs(geography = "tract",
+                  year = 2017,
                   variables = c("B01003_001", # Population
                                 "B25002_001", # Total housing units *and* denom for vhu
                                 "B25003_001", # Denom for own
